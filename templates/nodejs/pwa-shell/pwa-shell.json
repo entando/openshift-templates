@@ -150,10 +150,7 @@
               "secret": "${GENERIC_WEBHOOK_SECRET}"
             }
           }
-        ],
-        "postCommit": {
-          "script": "npm test"
-        }
+        ]
       }
     },
     {
