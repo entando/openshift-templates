@@ -98,6 +98,30 @@
               {
                 "name": "NPM_MIRROR",
                 "value": "${NPM_MIRROR}"
+              },
+              {
+                "name": "REACT_APP_USE_MOCKS",
+                "value": "${REACT_APP_USE_MOCKS}"
+              },
+              {
+                "name": "REACT_APP_DOMAIN",
+                "value": "${REACT_APP_DOMAIN}"
+              },
+              {
+                "name": "REACT_APP_CLIENT_ID",
+                "value": "${REACT_APP_CLIENT_ID}"
+              },
+              {
+                "name": "REACT_APP_CLIENT_SECRET",
+                "value": "${REACT_APP_CLIENT_SECRET}"
+              },
+              {
+                "name": "REACT_APP_DEMO_USERNAME",
+                "value": "${REACT_APP_DEMO_USERNAME}"
+              },
+              {
+                "name": "REACT_APP_DEMO_PASSWORD",
+                "value": "${REACT_APP_DEMO_PASSWORD}"
               }
             ]
           }
