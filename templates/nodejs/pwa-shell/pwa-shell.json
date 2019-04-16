@@ -91,7 +91,6 @@
           "sourceStrategy": {
             "from": {
               "kind": "DockerImage",
-              "namespace": "${NAMESPACE}",
               "name": "entando/eap-nodejs-openshift:${IMAGE_VERSION}"
             },
             "env":  [
@@ -247,13 +246,6 @@
       "description": "The name assigned to all of the frontend objects defined in this template.",
       "required": true,
       "value": "pwa-shell"
-    },
-    {
-      "name": "NAMESPACE",
-      "displayName": "Namespace",
-      "description": "The OpenShift Namespace where the ImageStream resides.",
-      "required": true,
-      "value": "openshift"
     },
     {
       "name": "IMAGE_VERSION",
