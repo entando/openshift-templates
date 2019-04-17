@@ -39,12 +39,12 @@ parameters:
     displayName: DB Initial Pool Size
     name: DB_INITIAL_POOL_SIZE
     required: true
-    value: 5
+    value: "5"
   - description: Used to set the max number of allowed connections to the db
     displayName: DB Max Pool Size
     name: DB_MAX_POOL_SIZE
     required: true
-    value: 25
+    value: "25"
   - description: Used to set the jndi name to be used for the entando port db
     displayName: JNDI Name Port Data Source
     name: DB_PORT_JNDI
@@ -88,11 +88,11 @@ parameters:
   - description: Used to set minimum heap size allocation. Expressed in MBytes. Default value 1024
     displayName: -Xms Value
     name: XMS
-    value: 1024
+    value: "1024"
   - description: Used to set maximum heap size allocation. Expressed in MBytes. Default value 1024
     displayName: -Xmx Value
     name: XMX
-    value: 1024
+    value: "1024"
 objects:
   - apiVersion: v1
     kind: ImageStream
