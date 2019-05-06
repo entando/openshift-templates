@@ -4,7 +4,7 @@
   "metadata": {
     "name": "nodejs-pwa-shell",
     "annotations": {
-      "openshift.io/display-name": "Node.js",
+      "openshift.io/display-name": "Node-pwa-shell",
       "description": "An example Node.js application with no database. For more information about using this template, including OpenShift considerations, see https://github.com/sclorg/nodejs-ex/blob/master/README.md.",
       "tags": "quickstart,nodejs",
       "iconClass": "icon-nodejs",
@@ -17,8 +17,8 @@
   },
   "message": "The following service(s) have been created in your project: ${NAME}.\n\nFor more information about using this template, including OpenShift considerations, see https://github.com/sclorg/nodejs-ex/blob/master/README.md.",
   "labels": {
-    "template": "nodejs",
-    "app": "nodejs"
+    "template": "nodejs-pwa-shell",
+    "app": "pwa-shell"
   },
   "objects": [
     {
