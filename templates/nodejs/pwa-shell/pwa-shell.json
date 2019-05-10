@@ -2,9 +2,9 @@
   "kind": "Template",
   "apiVersion": "v1",
   "metadata": {
-    "name": "nodejs-pwa-shell",
+    "name": "pwa-shell",
     "annotations": {
-      "openshift.io/display-name": "Node-pwa-shell",
+      "openshift.io/display-name": "pwa-shell",
       "description": "An example Node.js application with no database. For more information about using this template, including OpenShift considerations, see https://github.com/sclorg/nodejs-ex/blob/master/README.md.",
       "tags": "quickstart,nodejs",
       "iconClass": "icon-nodejs",
@@ -17,7 +17,7 @@
   },
   "message": "The following service(s) have been created in your project: ${NAME}.\n\nFor more information about using this template, including OpenShift considerations, see https://github.com/sclorg/nodejs-ex/blob/master/README.md.",
   "labels": {
-    "template": "nodejs-pwa-shell",
+    "template": "pwa-shell",
     "app": "pwa-shell"
   },
   "objects": [
@@ -314,7 +314,7 @@
       "displayName": "Entando engine-api url to call",
       "description": "URI of the entando-engine api",
       "required": true,
-      "value": "https://pwa-provider.127.0.0.1.nip.io/pwa-provider"
+      "value": "http://pwa-provider.127.0.0.1.nip.io/pwa-provider"
     },
     {
       "name": "REACT_APP_CLIENT_ID",
