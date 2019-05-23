@@ -309,6 +309,8 @@ objects:
             - env:
                 - name: DB_DRIVER
                   value: "${DB_DRIVER}"
+                - name: DB_SQL_CHECK
+                  value: "${DB_SQL_CHECK}"
                 - name: DB_INITIAL_POOL_SIZE
                   value: "${DB_INITIAL_POOL_SIZE}"
                 - name: DB_MAX_POOL_SIZE
