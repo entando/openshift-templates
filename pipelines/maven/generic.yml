@@ -7,7 +7,12 @@ parameters:
     description: The name assigned to all of the application objects defined in this template.
     displayName: Application Name
     required: true
-    value: 
+    value:
+  - name: ARTIFACT_NAME
+    description: Name of the artifact to be deployed on JBoss
+    displayName: Artifact name
+    required: true
+    value: your-app.war
   - name: GIT_SOURCE_URL
     description: The source URL for the application
     displayName: Source URL
@@ -80,6 +85,11 @@ parameters:
     name: DB_SERV_UID
     required: true
     value: agile
+  - description: Define the select to check DB connectivity. Default value is (SELECT 1) if you are using Oracle DB use (SELECT 1 FROM dual) instead.
+    displayName: Sql Check
+    name: DB_SQL_CHECK
+    required: true
+    value: SELECT 1
   - description: Used to set the password for the connection to entando's serv db
     displayName: DB Serv Password
     name: DB_SERV_PSW
@@ -187,19 +197,23 @@ objects:
                         */
                         
                         stage("Checkout") {
+                             /*use for public repositories*/
                             git url: "${gitUrl}", branch: "${gitBranch}"
+                            /*use for private repositories
+                            checkout([$class: 'GitSCM', branches: [[name: "*/${gitBranch}"]], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'bitbucket', url: "${gitUrl}"]]])
+                            */
                         }
                         stage("Build WAR") {
-                            sh "cd ${contextDir} && mvn clean package -Popenshift"
+                            sh "mvn clean package -Popenshift"
                             //archiveArtifacts artifacts: 'target/youwar.war'
-                            stash includes: "${contextDir}", name: 'war'
+                            stash includes: "target/${artifactName}", name: 'war'
                         }
                     }
 
                     node {
                         stage("Build Image") {
                             unstash name: 'war'
-                            sh "oc start-build ${appName}-docker --from-file=${conextDir}target/${artifactName} -n ${project}"
+                            sh "oc start-build ${appName}-docker --from-file=target/${artifactName} -n ${project}"
                             timeout(time: 20, unit: 'MINUTES') {
                                 openshift.withCluster() {
                                     openshift.withProject() {
@@ -254,10 +268,10 @@ objects:
       source:
         dockerfile: |-
           FROM entando/eap-imagick-okd:1.0
-          COPY pwa-provider.war /opt/eap/standalone/deployments/pwa-provider.war
+          COPY ${ARTIFACT_NAME} /opt/eap/standalone/deployments/${ARTIFACT_NAME}
           CMD /opt/eap/bin/openshift-launch.sh
         binary:
-          asFile: pwa-provider.war
+          asFile: ${ARTIFACT_NAME}
         type: Docker
       strategy:
         dockerStrategy:
