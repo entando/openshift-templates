@@ -302,7 +302,7 @@ objects:
       runPolicy: Serial
       source:
         dockerfile: |-
-          FROM entando/eap-imagick-okd:1.0
+          FROM entando/eap-imagick-okd:multi-db
           COPY ${ARTIFACT_NAME} /opt/eap/standalone/deployments/${ARTIFACT_NAME}
           CMD /opt/eap/bin/openshift-launch.sh
         binary:
