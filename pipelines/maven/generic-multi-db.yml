@@ -346,6 +346,8 @@ objects:
                   value: "${PORT_DB_DRIVER}"
                 - name: SERV_DB_DRIVER
                   value: "${SERV_DB_DRIVER}"
+                - name: EXT_DB_DRIVER
+                  value: "${EXT_DB_DRIVER}"
                 - name: DB_SQL_CHECK
                   value: "${DB_SQL_CHECK}"
                 - name: DB_SQL_EXT_CHECK
