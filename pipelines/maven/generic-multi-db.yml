@@ -121,12 +121,12 @@ parameters:
     required: true
     value: agile
   - description: Define the select to check DB connectivity. Default value is (SELECT 1) if you are using Oracle DB use (SELECT 1 FROM dual) instead.
-    displayName: Sql Check
+    displayName: Sql Check Entando DBs
     name: DB_SQL_CHECK
     required: true
     value: SELECT 1
   - description: Define the select to check external DB connectivity. Default value is (SELECT 1) if you are using Oracle DB use (SELECT 1 FROM dual) instead.
-    displayName: Sql Check
+    displayName: Sql Check External DB
     name: DB_SQL_EXT_CHECK
     required: true
     value: SELECT 1
@@ -312,7 +312,7 @@ objects:
         dockerStrategy:
           from:
             kind: ImageStreamTag
-            name: eap:1.0
+            name: eap:multi-db
         type: Docker
       triggers: []
   - apiVersion: v1
