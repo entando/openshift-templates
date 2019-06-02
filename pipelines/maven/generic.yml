@@ -29,6 +29,18 @@ parameters:
     generate: expression
     name: GITHUB_WEBHOOK_SECRET
     required: true
+  - description: GitLab trigger secret.  A difficult to guess string encoded as part of the webhook URL.  Not encrypted.
+    displayName: GitLab Webhook Secret
+    from: '[a-zA-Z0-9]{40}'
+    generate: expression
+    name: GITLAB_WEBHOOK_SECRET
+    required: true
+  - description: Bitbucket trigger secret.  A difficult to guess string encoded as part of the webhook URL.  Not encrypted.
+    displayName: Bitbucket Webhook Secret
+    from: '[a-zA-Z0-9]{40}'
+    generate: expression
+    name: BITBUCKET_WEBHOOK_SECRET
+    required: true
   - description: A secret string used to configure the Generic webhook.
     displayName: Generic Webhook Secret
     from: '[a-zA-Z0-9]{40}'
