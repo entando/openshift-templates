@@ -248,6 +248,12 @@ objects:
         - github:
             secret: "${GITHUB_WEBHOOK_SECRET}"
           type: GitHub
+        - gitlab:
+            secret: "${GITLAB_WEBHOOK_SECRET}"
+          type: GitLab
+        - bitbucket:
+            secret: "${BITBUCKET_WEBHOOK_SECRET}"
+          type: Bitbucket
         - generic:
             secret: "${GENERIC_WEBHOOK_SECRET}"
           type: Generic
