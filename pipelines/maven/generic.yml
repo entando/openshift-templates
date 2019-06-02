@@ -54,7 +54,7 @@ parameters:
     displayName: JNDI Name Port Data Source
     name: DB_PORT_JNDI
     required: true
-    value: java:jboss/datasources/[your-project]PortDatasource
+    value: java:jboss/datasources/[your-project]PortDataSource
   - description: Used to set the connection string for the entando's port db
     displayName: DB Port Connection String
     name: DB_PORT_CONN

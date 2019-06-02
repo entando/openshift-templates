@@ -1,18 +1,18 @@
 apiVersion: v1
 kind: Template
 metadata:
-  name: maven-pipeline-generic-multi-db
+  name: foresteria
 parameters:
   - name: APP_NAME
     description: The name assigned to all of the application objects defined in this template.
     displayName: Application Name
     required: true
-    value:
+    value: foresteria
   - name: ARTIFACT_NAME
     description: Name of the artifact to be deployed on JBoss
     displayName: Artifact name
     required: true
-    value: your-app.war
+    value: foresteria.war
   - name: GIT_SOURCE_URL
     description: The source URL for the application
     displayName: Source URL
@@ -22,7 +22,7 @@ parameters:
     description: The source Ref for the application(branch name)
     displayName: Source Ref
     required: true
-    value: master
+    value: openshift
   - description: Github trigger secret.  A difficult to guess string encoded as part of the webhook URL.  Not encrypted.
     displayName: GitHub Webhook Secret
     from: '[a-zA-Z0-9]{40}'
@@ -45,36 +45,31 @@ parameters:
     name: DB_MAX_POOL_SIZE
     required: true
     value: "100"
-  - description: DB driver to use for PortDB. Valid values are (oracle, postgresql, mysql)
-    displayName: Port DB Driver
-    name: PORT_DB_DRIVER
+  - description: DB driver to use. Valid values are (oracle, postgresql, mysql)
+    displayName: DB Driver
+    name: DB_DRIVER
     required: true
-    value: postgresql
+    value: oracle
   - description: Used to set the jndi name to be used for the entando port db
     displayName: JNDI Name Port Data Source
     name: DB_PORT_JNDI
     required: true
-    value: java:jboss/datasources/[your-project]PortDatasource
+    value: java:jboss/datasources/[your-project]PortDataSource
   - description: Used to set the connection string for the entando's port db
     displayName: DB Port Connection String
     name: DB_PORT_CONN
     required: true
-    value: jdbc:postgresql://localhost:5432/ENTANDOPORT
+    value: jdbc:oracle:thin:@[your-oracle-server]:1521/SERVICE
   - description: Used to set the username for the connection to entando's port d
     displayName: DB Port Username
     name: DB_PORT_UID
     required: true
-    value: agile
+    value: foresteriaport
   - description: Used to set the password for the connection to entando's port db
     displayName: DB Port Password
     name: DB_PORT_PSW
     required: true
-    value: agile
-  - description: DB driver to use for ServDB. Valid values are (oracle, postgresql, mysql)
-    displayName: Serv DB Driver
-    name: SERV_DB_DRIVER
-    required: true
-    value: postgresql
+    value: password
   - description: Used to set the jndi name to be used for the entando serv db
     displayName: JNDI Name Serv Data Source
     name: DB_SERV_JNDI
@@ -84,52 +79,62 @@ parameters:
     displayName: DB Serv Connection String
     name: DB_SERV_CONN
     required: true
-    value: jdbc:postgresql://localhost:5432/ENTANDOSERV
+    value: jdbc:oracle:thin:@[your-oracle-server]:1521/SERVICE
   - description: Used to set the username for the connection to entando's serv db
     displayName: DB Serv Username
     name: DB_SERV_UID
     required: true
-    value: agile
+    value: foresteriaserv
   - description: Used to set the password for the connection to entando's serv db
     displayName: DB Serv Password
     name: DB_SERV_PSW
     required: true
-    value: agile
-  - description: DB driver to use for ExternalDB. Valid values are (oracle, postgresql, mysql)
-    displayName: External DB Driver
-    name: EXT_DB_DRIVER
+    value: password
+  - description: Used to set the jndi name to be used for the foresteria db
+    displayName: JNDI Name Foresteria Data Source
+    name: DB_FORESTERIA_JNDI
     required: true
-    value: postgresql
-  - description: Used to set the jndi name to be used for the external db
-    displayName: JNDI Name External Data Source
-    name: DB_EXT_JNDI
+    value: java:jboss/datasources/foresteriaDataSource
+  - description: Used to set the connection string for the foresteria db
+    displayName: DB Foresteria Connection String
+    name: DB_FORESTERIA_CONN
     required: true
-    value: java:jboss/datasources/extDataSource
-  - description: Used to set the connection string for the external db
-    displayName: DB External Connection String
-    name: DB_EXT_CONN
+    value: jdbc:oracle:thin:@[your-oracle-server]:1521/SERVICE
+  - description: Used to set the username for the connection to foresteria db
+    displayName: DB Foresteria Username
+    name: DB_FORESTERIA_UID
     required: true
-    value: jdbc:postgresql://localhost:5432/EXTERNALDB
-  - description: Used to set the username for the connection to external db
-    displayName: DB External Username
-    name: DB_EXT_UID
+    value: foresteria
+  - description: Used to set the password for the connection to foresteria db
+    displayName: DB Foresteria Password
+    name: DB_FORESTERIA_PSW
     required: true
-    value: agile
-  - description: Used to set the password for the connection to external db
-    displayName: DB External Password
-    name: DB_EXT_PSW
+    value: password
+  - description: Used to set the jndi name to be used for the aggate db
+    displayName: JNDI Name Aggate Data Source
+    name: DB_AGGATE_JNDI
     required: true
-    value: agile
+    value: java:jboss/datasources/aggateDataSource
+  - description: Used to set the connection string for the aggate db
+    displayName: DB Aggate Connection String
+    name: DB_AGGATE_CONN
+    required: true
+    value: jdbc:oracle:thin:@[your-oracle-server]:1521/SERVICE
+  - description: Used to set the username for the connection to aggate db
+    displayName: DB Aggate Username
+    name: DB_AGGATE_UID
+    required: true
+    value: aggate
+  - description: Used to set the password for the connection to aggate db
+    displayName: DB Aggate Password
+    name: DB_AGGATE_PSW
+    required: true
+    value: password
   - description: Define the select to check DB connectivity. Default value is (SELECT 1) if you are using Oracle DB use (SELECT 1 FROM dual) instead.
     displayName: Sql Check Entando DBs
     name: DB_SQL_CHECK
     required: true
-    value: SELECT 1
-  - description: Define the select to check external DB connectivity. Default value is (SELECT 1) if you are using Oracle DB use (SELECT 1 FROM dual) instead.
-    displayName: Sql Check External DB
-    name: DB_SQL_EXT_CHECK
-    required: true
-    value: SELECT 1
+    value: SELECT 1 FROM dual
   - description: Used to set minimum heap size allocation. Expressed in MBytes. Default value 1024
     displayName: -Xms Value
     name: XMS
@@ -181,6 +186,9 @@ objects:
     spec:
       strategy:
         jenkinsPipelineStrategy:
+          env:
+            - name: APP_NAME
+              value: ${APP_NAME}
           jenkinsfile: |-
             try {
                 timeout(time: 20, unit: 'MINUTES') {
@@ -193,12 +201,12 @@ objects:
                     // @contextDir the path of the dir containing your source code(put a trailing slash / at the end of your path). Leave it empty if it's on the root
                     // @artifactName the name of the artifact(war) generated by your entando project
                     */
-                    def appName="pwa-provider"
+                    def appName="${env.APP_NAME}"
                     def project=""
                     def gitUrl="https://github.com/..."
-                    def gitBranch="master"
+                    def gitBranch="openshift"
                     def contextDir=""
-                    def artifactName="project-name.war"
+                    def artifactName="foresteria.war"
 
                     node {
                         stage("Initialize") {
@@ -209,14 +217,14 @@ objects:
                     node("maven") {
                          // uncomment if you need to overwrite the default maven repository
                          
-                         /* stage("update mirror") {
+                            stage("update mirror") {
                             sh "cat ~/.m2/settings.xml"
-                            sh "sed -i 's|<!-- ### configured mirrors ### -->|<mirror><mirrorOf>*</mirrorOf><url>https://repository.entando.org/repository/maven-public/</url><id>mirror</id></mirror>|' ~/.m2/settings.xml"
+                            sh "sed -i 's|<!-- ### configured mirrors ### -->|<mirror><mirrorOf>*</mirrorOf><url>[your-internal-nexus]</url><id>mirror</id></mirror>|' ~/.m2/settings.xml"
                             sh "cat ~/.m2/settings.xml"
                         }
                         stage("info") {
                         sh "cat ~/.m2/settings.xml"
-                        }*/
+                        }
 
                         // uncomment if you need to enable proxy settings
 
@@ -342,16 +350,10 @@ objects:
         spec:
           containers:
             - env:
-                - name: PORT_DB_DRIVER
-                  value: "${PORT_DB_DRIVER}"
-                - name: SERV_DB_DRIVER
-                  value: "${SERV_DB_DRIVER}"
-                - name: EXT_DB_DRIVER
-                  value: "${EXT_DB_DRIVER}"
+                - name: DB_DRIVER
+                  value: "${DB_DRIVER}"
                 - name: DB_SQL_CHECK
                   value: "${DB_SQL_CHECK}"
-                - name: DB_SQL_EXT_CHECK
-                  value: "${DB_SQL_EXT_CHECK}"
                 - name: DB_INITIAL_POOL_SIZE
                   value: "${DB_INITIAL_POOL_SIZE}"
                 - name: DB_MAX_POOL_SIZE
@@ -372,14 +374,22 @@ objects:
                   value: "${DB_SERV_UID}"
                 - name: DB_SERV_PSW
                   value: "${DB_SERV_PSW}"
-                - name: DB_EXT_JNDI
-                  value: "${DB_EXT_JNDI}"
-                - name: DB_EXT_CONN
-                  value: "${DB_EXT_CONN}"
-                - name: DB_EXT_UID
-                  value: "${DB_EXT_UID}"
-                - name: DB_EXT_PSW
-                  value: "${DB_EXT_PSW}"
+                - name: DB_FORESTERIA_JNDI
+                  value: "${DB_FORESTERIA_JNDI}"
+                - name: DB_FORESTERIA_CONN
+                  value: "${DB_FORESTERIA_CONN}"
+                - name: DB_FORESTERIA_UID
+                  value: "${DB_FORESTERIA_UID}"
+                - name: DB_FORESTERIA_PSW
+                  value: "${DB_AGGATE_PSW}"
+                - name: DB_AGGATE_JNDI
+                  value: "${DB_AGGATE_JNDI}"
+                - name: DB_AGGATE_CONN
+                  value: "${DB_AGGATE_CONN}"
+                - name: DB_AGGATE_UID
+                  value: "${DB_AGGATE_UID}"
+                - name: DB_AGGATE_PSW
+                  value: "${DB_AGGATE_PSW}"
                 - name: XMS
                   value: "${XMS}"
                 - name: XMX
