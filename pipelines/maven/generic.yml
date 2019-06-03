@@ -356,6 +356,9 @@ objects:
               image: ${APP_NAME}:latest
               imagePullPolicy: Always
               name: ${APP_NAME}
+              volumeMounts:
+                - mountPath: "/entando-resources"
+                  name: volume-${APP_NAME}
               ports:
                 - containerPort: 8080
                   protocol: TCP
@@ -384,6 +387,10 @@ objects:
                 periodSeconds: 10
                 successThreshold: 1
                 failureThreshold: 3
+          volumes:
+            - name: volume-${APP_NAME}
+              persistentVolumeClaim:
+                claimName: claim-${APP_NAME}
           dnsPolicy: ClusterFirst
           restartPolicy: Always
           securityContext: {}
