@@ -66,7 +66,7 @@ parameters:
     displayName: JNDI Name Port Data Source
     name: DB_PORT_JNDI
     required: true
-    value: java:jboss/datasources/[your-project]PortDataSource
+    value: java:jboss/datasources/foresteriaPortDataSource
   - description: Used to set the connection string for the entando's port db
     displayName: DB Port Connection String
     name: DB_PORT_CONN
@@ -86,7 +86,7 @@ parameters:
     displayName: JNDI Name Serv Data Source
     name: DB_SERV_JNDI
     required: true
-    value: java:jboss/datasources/[your-project]ServDataSource
+    value: java:jboss/datasources/foresteriaServDataSource
   - description: Used to set the connection string for the entando's serv db
     displayName: DB Serv Connection String
     name: DB_SERV_CONN
@@ -415,6 +415,9 @@ objects:
               image: ${APP_NAME}:latest
               imagePullPolicy: Always
               name: ${APP_NAME}
+              volumeMounts:
+                - mountPath: "/entando-resources"
+                  name: foresteriav
               ports:
                 - containerPort: 8080
                   protocol: TCP
@@ -443,6 +446,10 @@ objects:
                 periodSeconds: 10
                 successThreshold: 1
                 failureThreshold: 3
+          volumes:
+            - name: foresteriav
+              persistenVolumeClaim:
+                claimName: foresteriaclaim
           dnsPolicy: ClusterFirst
           restartPolicy: Always
           securityContext: {}
