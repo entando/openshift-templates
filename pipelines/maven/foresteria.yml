@@ -265,7 +265,7 @@ objects:
                             */
                         }
                         stage("Build WAR") {
-                            sh "cd foresteria && mvn clean package -Popenshift -DskipTests && cd.."
+                            sh "cd foresteria && mvn clean package -Popenshift -DskipTests && cd .."
                             //archiveArtifacts artifacts: 'target/youwar.war'
                             stash includes: "foresteria/target/${artifactName}", name: 'war'
                         }
