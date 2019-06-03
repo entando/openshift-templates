@@ -454,7 +454,7 @@ objects:
                 failureThreshold: 3
           volumes:
             - name: foresteriav
-              persistenVolumeClaim:
+              persistentVolumeClaim:
                 claimName: foresteriaclaim
           dnsPolicy: ClusterFirst
           restartPolicy: Always
