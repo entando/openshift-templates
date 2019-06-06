@@ -99,6 +99,22 @@
                 "value": "${NPM_MIRROR}"
               },
               {
+                "name": "REACT_APP_KEYCLOAK_URL",
+                "value": "${REACT_APP_KEYCLOAK_URL}"
+              },
+              {
+                "name": "REACT_APP_KEYCLOAK_REALM",
+                "value": "${REACT_APP_KEYCLOAK_REALM}"
+              },
+              {
+                "name": "REACT_APP_KEYCLOAK_CLIENT_ID",
+                "value": "${REACT_APP_KEYCLOAK_CLIENT_ID}"
+              },
+              {
+                "name": "REACT_APP_USE_KEYCLOAK",
+                "value": "${REACT_APP_USE_KEYCLOAK}"
+              },
+              {
                 "name": "REACT_APP_USE_MOCKS",
                 "value": "${REACT_APP_USE_MOCKS}"
               },
@@ -301,6 +317,30 @@
       "displayName": "Custom NPM Mirror URL",
       "description": "The custom NPM mirror URL",
       "value": ""
+    },
+    {
+      "name": "REACT_APP_KEYCLOAK_URL",
+      "displayName": "Keycloak URI",
+      "description": "URI of the Keycloak server instance",
+      "value": "https://localhost:8081/auth"
+    },
+    {
+      "name": "REACT_APP_KEYCLOAK_REALM",
+      "displayName": "Keycloak Realm",
+      "description": "Realm to authenticate to",
+      "value": "entando-development"
+    },
+    {
+      "name": "REACT_APP_KEYCLOAK_CLIENT_ID",
+      "displayName": "Client ID",
+      "description": "Keycloack client ID",
+      "value": "entando-pwa"
+    },
+    {
+      "name": "REACT_APP_USE_KEYCLOAK",
+      "displayName": "Use Keycloak?",
+      "description": "Do you want to enable Keycloak?",
+      "value": "true"
     },
     {
       "name": "REACT_APP_USE_MOCKS",
