@@ -333,7 +333,7 @@
     {
       "name": "REACT_APP_KEYCLOAK_CLIENT_ID",
       "displayName": "Client ID",
-      "description": "Keycloack client ID",
+      "description": "Keycloak client ID",
       "value": "entando-pwa"
     },
     {
