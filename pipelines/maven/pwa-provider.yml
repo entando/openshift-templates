@@ -18,6 +18,31 @@ parameters:
     displayName: Source Ref
     required: true
     value: master
+  - name: KEYCLOAK_AUTH_URL
+    description: Keycloak server instance url
+    displayName: Keycloak server address
+    required: true
+    value:
+  - name: KEYCLOAK_REALM
+    description: Keycloak realm
+    displayName: Keycloak realm
+    required: true
+    value:
+  - name: KEYCLOAK_CLIENT_ID
+    description: Keycloak clientID
+    displayName: Keycloak clientID
+    required: true
+    value: entando-pwa
+  - name: KEYCLOAK_CLIENT_SECRET
+    description: Keycloak client secret
+    displayName: Keycloak client secret
+    required: true
+    value: master
+  - name: KEYCLOAK_PUBLIC_CLIENT_ID
+    description: Keycloak public clientID
+    displayName: Public clientID
+    required: true
+    value: entando-web
   - description: Github trigger secret.  A difficult to guess string encoded as part of the webhook URL.  Not encrypted.
     displayName: GitHub Webhook Secret
     from: '[a-zA-Z0-9]{40}'
@@ -257,31 +282,41 @@ objects:
           containers:
             - env:
                 - name: DB_DRIVER
-                  value: "oracle"
+                  value: "${DB_DRIVER}"
                 - name: DB_INITIAL_POOL_SIZE
-                  value: "5"
+                  value: "${DB_INITIAL_POOL_SIZE}"
                 - name: DB_MAX_POOL_SIZE
-                  value: "20"
+                  value: "${DB_MAX_POOL_SIZE}"
                 - name: DB_PORT_JNDI
-                  value: "java:jboss/datasources/pwa-providerPortDataSource"
+                  value: "${DB_PORT_JNDI}"
                 - name: DB_PORT_CONN
-                  value: "jdbc:oracle:thin:@localhost:15210/ENTANDOPORT"
+                  value: "${DB_PORT_CONN}"
                 - name: DB_PORT_UID
-                  value: "agile"
+                  value: "${DB_PORT_UID}"
                 - name: DB_PORT_PSW
-                  value: "agile"
+                  value: "${DB_PORT_PSW}"
                 - name: DB_SERV_JNDI
-                  value: "java:jboss/datasources/pwa-providerServDataSource"
+                  value: "${DB_SERV_JNDI}"
                 - name: DB_SERV_CONN
-                  value: "jdbc:oracle:thin:@localhost:15210/ENTANDOSERV"
+                  value: "${DB_SERV_CONN}"
                 - name: DB_SERV_UID
-                  value: "agile"
+                  value: "${DB_SERV_UID}"
                 - name: DB_SERV_PSW
-                  value: "agile"
+                  value: "${DB_SERV_PSW}"
+                - name: KEYCLOAK_AUTH_URL
+                  value: "${KEYCLOAK_AUTH_URL}"
+                - name: KEYCLOAK_REALM
+                  value: "${KEYCLOAK_REALM}"
+                - name: KEYCLOAK_CLIENT_ID
+                  value: "${KEYCLOAK_CLIENT_ID}"
+                - name: KEYCLOAK_CLIENT_SECRET
+                  value: "${KEYCLOAK_CLIENT_SECRET}"
+                - name: KEYCLOAK_PUBLIC_CLIENT_ID
+                  value: "${KEYCLOAK_PUBLIC_CLIENT_ID}"
                 - name: XMS
-                  value: "1024"
+                  value: "${XMS}"
                 - name: XMX
-                  value: "1024"
+                  value: "${XMX}"
               image: ${APP_NAME}:latest
               imagePullPolicy: Always
               name: ${APP_NAME}
