@@ -370,7 +370,7 @@ objects:
                   path: /
                   port: 8080
                   scheme: HTTP
-                initialDelaySeconds: 10
+                initialDelaySeconds: 180
                 timeoutSeconds: 2
                 periodSeconds: 10
                 successThreshold: 1
@@ -380,7 +380,7 @@ objects:
                   path: /
                   port: 8080
                   scheme: HTTP
-                initialDelaySeconds: 30
+                initialDelaySeconds: 120
                 timeoutSeconds: 2
                 periodSeconds: 10
                 successThreshold: 1
@@ -435,4 +435,7 @@ objects:
         weight: 100
       port:
         targetPort: 8080-tcp
+      tls:
+        insecureEdgeTerminationPolicy: Redirect
+        termination: edge
       wildcardPolicy: None
