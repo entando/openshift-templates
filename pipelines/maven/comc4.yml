@@ -7,7 +7,7 @@ parameters:
     description: The name assigned to all of the application objects defined in this template.
     displayName: Application Name
     required: true
-    value:
+    value: comc4ei
   - name: ARTIFACT_NAME
     description: Name of the artifact to be deployed on JBoss
     displayName: Artifact name
@@ -122,43 +122,43 @@ parameters:
     name: DB_SERV_PSW
     required: true
     value: agile
-  - description: Used to set the jndi name to be used for the external db
-    displayName: JNDI Name External Data Source
+  - description: Used to set the jndi name to be used for the entando db
+    displayName: JNDI Name Entando Data Source
     name: DB_ENTANDO_JNDI
     required: true
     value: java:jboss/datasources/comc4eiEntandoDataSource
-  - description: Used to set the connection string for the external db
-    displayName: DB External Connection String
+  - description: Used to set the connection string for the entando db
+    displayName: DB Entando Connection String
     name: DB_ENTANDO_CONN
     required: true
     value: jdbc:oracle:thin:@localhost:15210/TESTENV
-  - description: Used to set the username for the connection to external db
-    displayName: DB External Username
+  - description: Used to set the username for the connection to entando db
+    displayName: DB Entando Username
     name: DB_ENTANDO_UID
     required: true
     value: agile
-  - description: Used to set the password for the connection to external db
-    displayName: DB External Password
+  - description: Used to set the password for the connection to entando db
+    displayName: DB Entando Password
     name: DB_ENTANDO_PSW
     required: true
     value: agile
-  - description: Used to set the jndi name to be used for the external db
-    displayName: JNDI Name External Data Source
+  - description: Used to set the jndi name to be used for the anagrafica db
+    displayName: JNDI Name Anagrafica Data Source
     name: DB_ANAGRAFICA_JNDI
     required: true
-    value: java:jboss/datasources/comc4eiEntandoDataSource
-  - description: Used to set the connection string for the external db
-    displayName: DB External Connection String
+    value: java:jboss/datasources/comc4eiAnagraficaDataSource
+  - description: Used to set the connection string for the anagrafica db
+    displayName: DB Anagrafica Connection String
     name: DB_ANAGRAFICA_CONN
     required: true
     value: jdbc:oracle:thin:@localhost:15210/TESTENV
-  - description: Used to set the username for the connection to external db
-    displayName: DB External Username
+  - description: Used to set the username for the connection to anagrafica db
+    displayName: DB Anagrafica Username
     name: DB_ANAGRAFICA_UID
     required: true
     value: agile
-  - description: Used to set the password for the connection to external db
-    displayName: DB External Password
+  - description: Used to set the password for the connection to anagrafica db
+    displayName: DB Anagrafica Password
     name: DB_ANAGRAFICA_PSW
     required: true
     value: agile
