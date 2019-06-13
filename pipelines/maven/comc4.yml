@@ -162,6 +162,27 @@ parameters:
     name: DB_ANAGRAFICA_PSW
     required: true
     value: agile
+  - description: Namespace for the Kube Ping protocol
+    displayName: Namespace (i.e. Your project name)
+    name: OPENSHIFT_KUBE_PING_NAMESPACE
+    required: true
+    value:
+  - description: Define the label to identify your app for clustering functionality
+    displayName: Application label (i.e. app=[your app name])
+    name: OPENSHIFT_KUBE_PING_LABELS
+    required: true
+    value: app=${APP_NAME}
+  - description: JGroups Cluster password.
+    displayName: JGroups cluster password (Auto generated if left empty)
+    from: '[a-zA-Z0-9]{40}'
+    generate: expression
+    name: JGROUPS_CLUSTER_PASSWORD
+    required: true
+  - description: Kube Ping protocol port name. (Leave it unchanged.)
+    displayName: Kube Ping Port Name
+    name: OPENSHIFT_KUBE_PING_PORT_NAME
+    required: true
+    value: ping
   - description: DB driver to use. Valid values are (oracle, postgresql, mysql)
     displayName: DB Driver
     name: DB_DRIVER
@@ -449,6 +470,14 @@ objects:
                   value: "${KEYCLOAK_CLIENT_SECRET}"
                 - name: KEYCLOAK_PUBLIC_CLIENT_ID
                   value: "${KEYCLOAK_PUBLIC_CLIENT_ID}"
+                - name: OPENSHIFT_KUBE_PING_NAMESPACE
+                  value: "${OPENSHIFT_KUBE_PING_NAMESPACE}"
+                - name: OPENSHIFT_KUBE_PING_LABELS
+                  value: "${OPENSHIFT_KUBE_PING_LABELS}"
+                - name: OPENSHIFT_KUBE_PING_PORT_NAME
+                  value: "${OPENSHIFT_KUBE_PING_PORT_NAME}"
+                - name: JGROUPS_CLUSTER_PASSWORD
+                  value: "${JGROUPS_CLUSTER_PASSWORD}"
                 - name: XMS
                   value: "${XMS}"
                 - name: XMX
