@@ -223,14 +223,14 @@ objects:
             version: "7.6"
           from:
             kind: DockerImage
-            name: entando/eap-imagick-okd:multi-db
-          name: "multi-db"
+            name: entando/eap-imagick-okd:comc4
+          name: "comc4"
         - annotations:
             supports: jee,java
             tags: builder,eap,java
           from:
             kind: ImageStreamTag
-            name: "multi-db"
+            name: "comc4"
           name: latest
   - apiVersion: v1
     kind: BuildConfig
@@ -380,7 +380,7 @@ objects:
       runPolicy: Serial
       source:
         dockerfile: |-
-          FROM entando/eap-imagick-okd:multi-db
+          FROM entando/eap-imagick-okd:comc4
           COPY ${ARTIFACT_NAME} /opt/eap/standalone/deployments/${ARTIFACT_NAME}
           CMD /opt/eap/bin/openshift-launch.sh
         binary:
@@ -390,7 +390,7 @@ objects:
         dockerStrategy:
           from:
             kind: ImageStreamTag
-            name: eap:multi-db
+            name: eap:comc4
         type: Docker
       triggers: []
   - apiVersion: v1
