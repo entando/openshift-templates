@@ -118,6 +118,7 @@ parameters:
   - description: Set the storage size needed for your application.
     displayName: Persistent Storage Size
     name: STORAGE_SIZE
+    required: true
     value: "2Gi"
 objects:
   - apiVersion: v1
