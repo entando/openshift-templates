@@ -471,15 +471,15 @@ objects:
           type: ImageChange
     status: {}
   - apiVersion: v1
-      kind: PersistentVolumeClaim
-      metadata:
-        name: pvc-${APP_NAME}
-      spec:
-        accessModes:
-          - ReadWriteMany
-        resources:
-          requests:
-            storage: ${STORAGE_SIZE}
+    kind: PersistentVolumeClaim
+    metadata:
+      name: pvc-${APP_NAME}
+    spec:
+      accessModes:
+        - ReadWriteMany
+      resources:
+        requests:
+          storage: ${STORAGE_SIZE}
   - apiVersion: v1
     kind: Service
     metadata:
