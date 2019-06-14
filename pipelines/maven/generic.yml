@@ -115,6 +115,10 @@ parameters:
     displayName: -Xmx Value
     name: XMX
     value: "4096"
+  - description: Set the storage size needed for your application.
+    displayName: Persistent Storage Size
+    name: STORAGE_SIZE
+    value: "2Gi"
 objects:
   - apiVersion: v1
     kind: ImageStream
@@ -416,6 +420,16 @@ objects:
               name: ${APP_NAME}:latest
           type: ImageChange
     status: {}
+  - apiVersion: v1
+    kind: PersistentVolumeClaim
+    metadata:
+      name: pvc-${APP_NAME}
+    spec:
+      accessModes:
+        - ReadWriteMany
+      resources:
+        requests:
+          storage: ${STORAGE_SIZE}
   - apiVersion: v1
     kind: Service
     metadata:
