@@ -114,7 +114,7 @@ parameters:
   - description: Used to set maximum heap size allocation. Expressed in MBytes. Default value 1024
     displayName: -Xmx Value
     name: XMX
-    value: "4096"
+    value: "2048"
   - description: Set the storage size needed for your application.
     displayName: Persistent Storage Size
     name: STORAGE_SIZE
