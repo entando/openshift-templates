@@ -154,7 +154,12 @@ parameters:
   - description: Used to set maximum heap size allocation. Expressed in MBytes. Default value 1024
     displayName: -Xmx Value
     name: XMX
-    value: "4096"
+    value: "2048"
+  - description: Set the storage size needed for your application.
+    displayName: Persistent Storage Size
+    name: STORAGE_SIZE
+    required: true
+    value: "2Gi"
 objects:
   - apiVersion: v1
     kind: ImageStream
@@ -423,7 +428,7 @@ objects:
               name: ${APP_NAME}
               volumeMounts:
                 - mountPath: "/entando-resources"
-                  name: foresteriav
+                  name: volume-${APP_NAME}
               ports:
                 - containerPort: 8080
                   protocol: TCP
@@ -437,7 +442,7 @@ objects:
                   path: /
                   port: 8080
                   scheme: HTTP
-                initialDelaySeconds: 10
+                initialDelaySeconds: 180
                 timeoutSeconds: 2
                 periodSeconds: 10
                 successThreshold: 1
@@ -447,15 +452,15 @@ objects:
                   path: /
                   port: 8080
                   scheme: HTTP
-                initialDelaySeconds: 30
+                initialDelaySeconds: 120
                 timeoutSeconds: 2
                 periodSeconds: 10
                 successThreshold: 1
                 failureThreshold: 3
           volumes:
-            - name: foresteriav
+            - name: volume-${APP_NAME}
               persistentVolumeClaim:
-                claimName: foresteriaclaim
+                claimName: claim-${APP_NAME}
           dnsPolicy: ClusterFirst
           restartPolicy: Always
           securityContext: {}
@@ -472,6 +477,16 @@ objects:
               name: ${APP_NAME}:latest
           type: ImageChange
     status: {}
+  - apiVersion: v1
+    kind: PersistentVolumeClaim
+    metadata:
+      name: pvc-${APP_NAME}
+    spec:
+      accessModes:
+        - ReadWriteMany
+      resources:
+        requests:
+          storage: ${STORAGE_SIZE}
   - apiVersion: v1
     kind: Service
     metadata:
