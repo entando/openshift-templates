@@ -371,7 +371,9 @@ objects:
                 - containerPort: 8888
                   name: ping
                   protocol: TCP
-              resources: {}
+              resources:
+                requests:
+                  cpu: 500m
               terminationMessagePath: /dev/termination-log
               livenessProbe:
                 httpGet:
