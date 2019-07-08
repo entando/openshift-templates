@@ -1,0 +1,253 @@
+apiVersion: v1
+kind: Template
+metadata:
+  name: entando-appbuilder
+parameters:
+  - description: The name assigned to all of the frontend objects defined in this template.
+    displayName: Name
+    name: NAME
+    required: true
+    value: appbuilder
+  - description: Tag of Entando's nodejs image to use(default is master).
+    displayName: Entando's nodejs tag image
+    name: IMAGE_VERSION
+    required: true
+    value: master
+  - description: The URL of the repository with your application source code.
+    displayName: Git Repository URL
+    name: SOURCE_REPOSITORY_URL
+    required: true
+    value: https://github.com/entando/app-builder.git
+  - description: Set this to a branch name, tag or other ref of your repository if you are not using the default branch.
+    displayName: Git Reference
+    name: SOURCE_REPOSITORY_REF
+  - displayName: Use Mocks
+    name: USE_MOCKS
+    required: true
+    value: "false"
+  - description: URI of the entando engine-api.
+    displayName: Domain
+    name: DOMAIN
+    required: true
+  - description: Client ID authorized to make requests against entando engine-api server.
+    displayName: Client ID
+    name: CLIENT_ID
+    required: true
+    value: appbuilder
+  - description: Client secret.
+    displayName: Client secret
+    name: CLIENT_SECRET
+    required: true
+    value: appbuilder_secret
+  - displayName: Enable Digital Exchange
+    name: DIGITAL_EXCHANGE_UI_ENABLED
+    required: true
+    value: "true"
+  - description: Set this to the relative path to your project if it is not in the root of your repository.
+    displayName: Context Directory
+    name: CONTEXT_DIR
+  - description: Github trigger secret.  A difficult to guess string encoded as part of the webhook URL.  Not encrypted.
+    displayName: GitHub Webhook Secret
+    from: '[a-zA-Z0-9]{40}'
+    generate: expression
+    name: GITHUB_WEBHOOK_SECRET
+  - description: GitLab trigger secret.  A difficult to guess string encoded as part of the webhook URL.  Not encrypted.
+    displayName: GitLab Webhook Secret
+    from: '[a-zA-Z0-9]{40}'
+    generate: expression
+    name: GITLAB_WEBHOOK_SECRET
+    required: true
+  - description: Bitbucket trigger secret.  A difficult to guess string encoded as part of the webhook URL.  Not encrypted.
+    displayName: Bitbucket Webhook Secret
+    from: '[a-zA-Z0-9]{40}'
+    generate: expression
+    name: BITBUCKET_WEBHOOK_SECRET
+    required: true
+  - description: A secret string used to configure the Generic webhook.
+    displayName: Generic Webhook Secret
+    from: '[a-zA-Z0-9]{40}'
+    generate: expression
+    name: GENERIC_WEBHOOK_SECRET
+  - description: The custom NPM mirror URL
+    displayName: Custom NPM Mirror URL
+    name: NPM_MIRROR
+objects:
+  - apiVersion: v1
+    kind: BuildConfig
+    metadata:
+      annotations:
+        pipeline.alpha.openshift.io/uses: '[{"name": "${NAME}", "namespace": "", "kind": "DeploymentConfig"}]'
+      labels:
+        name: ${NAME}
+      name: ${NAME}
+    spec:
+      strategy:
+        jenkinsPipelineStrategy:
+          jenkinsfile: |-
+            try {
+               timeout(time: 20, unit: 'MINUTES') {
+                  node('nodejs') {
+                      stage('build') {
+                        openshift.withCluster() {
+                           openshift.withProject() {
+                              def bld = openshift.startBuild("${NAME}")
+                              bld.untilEach {
+                                return it.object().status.phase == "Running"
+                              }
+                              bld.logs("-f")
+                           }
+                        }
+                      }
+                      stage('deploy') {
+                        openshift.withCluster() {
+                          openshift.withProject() {
+                            def dc = openshift.selector("dc", "${NAME}")
+                            dc.rollout().latest()
+                          }
+                        }
+                      }
+                    }
+               }
+            } catch (err) {
+               echo "in catch block"
+               echo "Caught: ${err}"
+               currentBuild.result = "FAILURE"
+               throw err
+            }
+        type: JenkinsPipeline
+      triggers:
+        - github:
+            secret: "${GITHUB_WEBHOOK_SECRET}"
+          type: GitHub
+        - gitlab:
+            secret: "${GITLAB_WEBHOOK_SECRET}"
+          type: GitLab
+        - bitbucket:
+            secret: "${BITBUCKET_WEBHOOK_SECRET}"
+          type: Bitbucket
+        - generic:
+            secret: "${GENERIC_WEBHOOK_SECRET}"
+          type: Generic
+  - apiVersion: v1
+    kind: Service
+    metadata:
+      labels:
+      name: ${NAME}
+    spec:
+      ports:
+        - name: web
+          port: 8080
+          targetPort: 8080
+      selector:
+        name: ${NAME}
+  - apiVersion: v1
+    kind: Route
+    metadata:
+      name: ${NAME}
+    spec:
+      to:
+        kind: Service
+        name: ${NAME}
+        weight: 100
+      port:
+        targetPort: 8080-tcp
+      tls:
+        insecureEdgeTerminationPolicy: Redirect
+        termination: edge
+      wildcardPolicy: None
+  - apiVersion: v1
+    kind: ImageStream
+    metadata:
+      annotations:
+        description: Keeps track of changes in the application image
+      name: ${NAME}
+  - apiVersion: v1
+    kind: BuildConfig
+    metadata:
+      annotations:
+        description: Defines how to build the application
+      name: ${NAME}-docker
+    spec:
+      output:
+        to:
+          kind: ImageStreamTag
+          name: ${NAME}:latest
+      source:
+        contextDir: ${CONTEXT_DIR}
+        git:
+          ref: ${SOURCE_REPOSITORY_REF}
+          uri: ${SOURCE_REPOSITORY_URL}
+        type: Git
+      strategy:
+        sourceStrategy:
+          env:
+            - name: NPM_MIRROR
+              value: ${NPM_MIRROR}
+            - name: USE_MOCKS
+              value: ${USE_MOCKS}
+            - name: DOMAIN
+              value: ${DOMAIN}
+            - name: CLIENT_ID
+              value: ${CLIENT_ID}
+            - name: CLIENT_SECRET
+              value: ${CLIENT_SECRET}
+            - name: DIGITAL_EXCHANGE_UI_ENABLED
+              value: ${DIGITAL_EXCHANGE_UI_ENABLED}
+          from:
+            kind: DockerImage
+            name: entando/eap-nodejs-openshift:${IMAGE_VERSION}
+        type: Source
+      triggers:
+        - github:
+            secret: ${GITHUB_WEBHOOK_SECRET}
+          type: GitHub
+        - generic:
+            secret: ${GENERIC_WEBHOOK_SECRET}
+          type: Generic
+  - apiVersion: v1
+    kind: DeploymentConfig
+    metadata:
+      annotations:
+        description: Defines how to deploy the application server
+      name: ${NAME}
+    spec:
+      replicas: 1
+      selector:
+        name: ${NAME}
+      strategy:
+        type: Rolling
+      template:
+        metadata:
+          labels:
+            name: ${NAME}
+          name: ${NAME}
+        spec:
+          containers:
+              image: ${NAME}:latest
+              livenessProbe:
+                httpGet:
+                  path: /
+                  port: 8080
+                initialDelaySeconds: 30
+                timeoutSeconds: 3
+              name: entando-appbuilder
+              ports:
+                - containerPort: 8080
+              readinessProbe:
+                httpGet:
+                  path: /
+                  port: 8080
+                initialDelaySeconds: 3
+                timeoutSeconds: 3
+              resources:
+                limits:
+                  memory: ${MEMORY_LIMIT}
+      triggers:
+        - imageChangeParams:
+            automatic: true
+            containerNames:
+              - entando-appbuilder
+            from:
+              kind: ImageStreamTag
+              name: ${NAME}:latest
+          type: ImageChange
