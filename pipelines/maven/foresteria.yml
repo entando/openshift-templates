@@ -23,6 +23,14 @@ parameters:
     displayName: Source Ref
     required: true
     value: openshift
+  - name: GIT_SOURCE_URL_COMPONENTS
+    displayName: Entando components source VCS URL
+    description: Specify the url of your VCS server pointing to components project
+    required: true
+  - name: GIT_SOURCE_COMPONENTS_REF
+    displayName: Source ref of entando components project (branch name)
+    description: Specify the branch to be used to build from.
+    required: true
   - description: Github trigger secret.  A difficult to guess string encoded as part of the webhook URL.  Not encrypted.
     displayName: GitHub Webhook Secret
     from: '[a-zA-Z0-9]{40}'
@@ -253,8 +261,12 @@ objects:
               value: ${APP_NAME}
             - name: GIT_SOURCE_URL
               value: ${GIT_SOURCE_URL}
+            - name: GIT_SOURCE_URL_COMPONENTS
+              value: ${GIT_SOURCE_URL_COMPONENTS}
             - name: GIT_SOURCE_REF
               value: ${GIT_SOURCE_REF}
+            - name: GIT_SOURCE_COMPONENTS_REF
+              value: ${GIT_SOURCE_COMPONENTS_REF}
             - name: ARTIFACT_NAME
               value: ${ARTIFACT_NAME}
           jenkinsfile: |-
@@ -272,7 +284,9 @@ objects:
                     def appName="${APP_NAME}"
                     def project=""
                     def gitUrl="${GIT_SOURCE_URL}"
+                    def gitUrlComponents="${GIT_SOURCE_URL_COMPONENTS}"
                     def gitBranch="${GIT_SOURCE_REF}"
+                    def gitBranchComponents="${GIT_SOURCE_COMPONENTS_REF}"
                     def contextDir=""
                     def artifactName="${ARTIFACT_NAME}"
 
@@ -306,7 +320,16 @@ objects:
                         sh "cat ~/.m2/settings.xml"
                         }
                         */
-                        
+                        stage("Checkout Components") {
+                          /*use for public repositories*/
+                            git url: "${gitUrlComponents}", branch: "${gitBranchComponents}"
+                            /*use for private repositories
+                           checkout([$class: 'GitSCM', branches: [[name: "*/${gitBranchComponents}"]], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'bitbucket', url: "${gitUrlComponents}"]]])
+                           */
+                        }
+                        stage("Install dependencies") {
+                          sh "mvn clean install -DskipTests && mvn clean"
+                        }
                         stage("Checkout") {
                              /*use for public repositories*/
                             git url: "${gitUrl}", branch: "${gitBranch}"
