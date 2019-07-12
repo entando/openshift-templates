@@ -1,0 +1,583 @@
+apiVersion: v1
+kind: Template
+metadata:
+  name: einet
+parameters:
+  - name: APP_NAME
+    description: The name assigned to all of the application objects defined in this template.
+    displayName: Application Name
+    required: true
+    value: einet
+  - name: ARTIFACT_NAME
+    description: Name of the artifact to be deployed on JBoss
+    displayName: Artifact name
+    required: true
+    value: einet.war
+  - name: GIT_SOURCE_URL
+    description: The source URL for the application
+    displayName: Source URL
+    required: true
+    value: 
+  - name: GIT_SOURCE_REF
+    description: The source Ref for the application(branch name)
+    displayName: Source Ref
+    required: true
+    value: master
+  - name: GIT_SOURCE_COMPONENTS_URL
+    description: The source url of entando components project
+    displayName: Entando components source URL
+    required: true
+  - name: GIT_SOURCE_COMPONENTS_REF
+    description: The entando components source ref (branch name)
+    displayName: Entando components project branch name
+    required: true
+  - name: KEYCLOAK_AUTH_URL
+    description: Keycloak server instance url
+    displayName: Keycloak server address
+    required: true
+    value:
+  - name: KEYCLOAK_REALM
+    description: Keycloak realm
+    displayName: Keycloak realm
+    required: true
+    value:
+  - name: KEYCLOAK_CLIENT_ID
+    description: Keycloak clientID
+    displayName: Keycloak clientID
+    required: true
+    value: entando-einet
+  - name: KEYCLOAK_CLIENT_SECRET
+    description: Keycloak client secret
+    displayName: Keycloak client secret
+    required: true
+    value:
+  - name: KEYCLOAK_PUBLIC_CLIENT_ID
+    description: Keycloak public clientID
+    displayName: Public clientID
+    required: true
+    value: entando-web
+  - description: Github trigger secret.  A difficult to guess string encoded as part of the webhook URL.  Not encrypted.
+    displayName: GitHub Webhook Secret
+    from: '[a-zA-Z0-9]{40}'
+    generate: expression
+    name: GITHUB_WEBHOOK_SECRET
+    required: true
+  - description: GitLab trigger secret.  A difficult to guess string encoded as part of the webhook URL.  Not encrypted.
+    displayName: GitLab Webhook Secret
+    from: '[a-zA-Z0-9]{40}'
+    generate: expression
+    name: GITLAB_WEBHOOK_SECRET
+    required: true
+  - description: Bitbucket trigger secret.  A difficult to guess string encoded as part of the webhook URL.  Not encrypted.
+    displayName: Bitbucket Webhook Secret
+    from: '[a-zA-Z0-9]{40}'
+    generate: expression
+    name: BITBUCKET_WEBHOOK_SECRET
+    required: true
+  - description: A secret string used to configure the Generic webhook.
+    displayName: Generic Webhook Secret
+    from: '[a-zA-Z0-9]{40}'
+    generate: expression
+    name: GENERIC_WEBHOOK_SECRET
+    required: true
+  - description: Used to set initial pool size for db connections
+    displayName: DB Initial Pool Size
+    name: DB_INITIAL_POOL_SIZE
+    required: true
+    value: "5"
+  - description: Used to set the max number of allowed connections to the db
+    displayName: DB Max Pool Size
+    name: DB_MAX_POOL_SIZE
+    required: true
+    value: "100"
+  - description: Used to set the jndi name to be used for the entando port db
+    displayName: JNDI Name Port Data Source
+    name: DB_PORT_JNDI
+    required: true
+    value: java:jboss/datasources/eineteiPortDataSource
+  - description: Used to set the connection string for the entando's port db
+    displayName: DB Port Connection String
+    name: DB_PORT_CONN
+    required: true
+    value: jdbc:oracle:thin:@localhost:15210/TESTENV
+  - description: Used to set the username for the connection to entando's port d
+    displayName: DB Port Username
+    name: DB_PORT_UID
+    required: true
+    value: agile
+  - description: Used to set the password for the connection to entando's port db
+    displayName: DB Port Password
+    name: DB_PORT_PSW
+    required: true
+    value: agile
+  - description: Used to set the jndi name to be used for the entando serv db
+    displayName: JNDI Name Serv Data Source
+    name: DB_SERV_JNDI
+    required: true
+    value: java:jboss/datasources/eineteiServDataSource
+  - description: Used to set the connection string for the entando's serv db
+    displayName: DB Serv Connection String
+    name: DB_SERV_CONN
+    required: true
+    value: jdbc:oracle:thin:@localhost:15210/TESTENV
+  - description: Used to set the username for the connection to entando's serv db
+    displayName: DB Serv Username
+    name: DB_SERV_UID
+    required: true
+    value: agile
+  - description: Used to set the password for the connection to entando's serv db
+    displayName: DB Serv Password
+    name: DB_SERV_PSW
+    required: true
+    value: agile
+  - description: Used to set the jndi name to be used for the anagrafica db
+    displayName: JNDI Name Anagrafica Data Source
+    name: DB_ANAGRAFICA_JNDI
+    required: true
+    value: java:jboss/datasources/eineteiAnagraficaDataSource
+  - description: Used to set the connection string for the anagrafica db
+    displayName: DB Anagrafica Connection String
+    name: DB_ANAGRAFICA_CONN
+    required: true
+    value: jdbc:oracle:thin:@localhost:15210/TESTENV
+  - description: Used to set the username for the connection to anagrafica db
+    displayName: DB Anagrafica Username
+    name: DB_ANAGRAFICA_UID
+    required: true
+    value: agile
+  - description: Used to set the password for the connection to anagrafica db
+    displayName: DB Anagrafica Password
+    name: DB_ANAGRAFICA_PSW
+    required: true
+    value: agile
+  - description: Namespace for the Kube Ping protocol
+    displayName: Namespace (i.e. Your project name)
+    name: OPENSHIFT_KUBE_PING_NAMESPACE
+    required: true
+    value:
+  - description: Define the label to identify your app for clustering functionality
+    displayName: Application label (i.e. app=[your app name])
+    name: OPENSHIFT_KUBE_PING_LABELS
+    required: true
+    value: app=${APP_NAME}
+  - description: JGroups Cluster password.
+    displayName: JGroups cluster password (Auto generated if left empty)
+    from: '[a-zA-Z0-9]{40}'
+    generate: expression
+    name: JGROUPS_CLUSTER_PASSWORD
+    required: true
+  - description: Kube Ping protocol port name. (Leave it unchanged.)
+    displayName: Kube Ping Port Name
+    name: OPENSHIFT_KUBE_PING_PORT_NAME
+    required: true
+    value: ping
+  - description: DB driver to use. Valid values are (oracle, postgresql, mysql)
+    displayName: DB Driver
+    name: DB_DRIVER
+    required: true
+    value: oracle
+  - description: Define the select to check DB connectivity. Default value is (SELECT 1) if you are using Oracle DB use (SELECT 1 FROM dual) instead.
+    displayName: Sql Check Entando DBs
+    name: DB_SQL_CHECK
+    required: true
+    value: SELECT 1 FROM dual
+  - description: Used to set minimum heap size allocation. Expressed in MBytes. Default value 1024
+    displayName: -Xms Value
+    name: XMS
+    value: "1024"
+  - description: Used to set maximum heap size allocation. Expressed in MBytes. Default value 1024
+    displayName: -Xmx Value
+    name: XMX
+    value: "2048"
+  - description: Set the storage size needed for your application.
+    displayName: Persistent Storage Size
+    name: STORAGE_SIZE
+    required: true
+    value: "2Gi"
+objects:
+  - apiVersion: v1
+    kind: ImageStream
+    metadata:
+      labels:
+        app: ${APP_NAME}
+      name: ${APP_NAME}
+    spec: {}
+    status:
+      dockerImageRepository: ""
+  - apiVersion: v1
+    kind: ImageStream
+    metadata:
+      name: eap
+    spec:
+      tags:
+        - annotations:
+            supports: eap:7.6,jee,java
+            tags: builder,eap,java
+            version: "7.6"
+          from:
+            kind: DockerImage
+            name: entando/eap-imagick-okd:einet
+          name: "einet"
+        - annotations:
+            supports: jee,java
+            tags: builder,eap,java
+          from:
+            kind: ImageStreamTag
+            name: "einet"
+          name: latest
+  - apiVersion: v1
+    kind: BuildConfig
+    metadata:
+      annotations:
+        pipeline.alpha.openshift.io/uses: '[{"name": "${NAME}", "namespace": "", "kind": "DeploymentConfig"}]'
+      creationTimestamp: null
+      labels:
+        name: ${APP_NAME}
+      name: ${APP_NAME}
+    spec:
+      strategy:
+        jenkinsPipelineStrategy:
+          env:
+            - name: APP_NAME
+              value: ${APP_NAME}
+            - name: GIT_SOURCE_URL
+              value: ${GIT_SOURCE_URL}
+            - name: GIT_SOURCE_REF
+              value: ${GIT_SOURCE_REF}
+            - name: GIT_SOURCE_COMPONENTS_URL
+              value: ${GIT_SOURCE_COMPONENTS_URL}
+            - name: GIT_SOURCE_COMPONENTS_REF
+              value: ${GIT_SOURCE_COMPONENTS_REF}
+            - name: ARTIFACT_NAME
+              value: ${ARTIFACT_NAME}
+          jenkinsfile: |-
+            try {
+                timeout(time: 20, unit: 'MINUTES') {
+                    /*
+                    // here you have to set correct values
+                    // @appName is the name of the application that will be created in Openshift's project
+                    // @project just leave it empty. It will be auto-pupulated with the name of your Openshift project
+                    // @gitUrl the url of your git repository
+                    // @gitBranch the name of the branch to be used to build from
+                    // @contextDir the path of the dir containing your source code(put a trailing slash / at the end of your path). Leave it empty if it's on the root
+                    // @artifactName the name of the artifact(war) generated by your entando project
+                    */
+                    def appName="${APP_NAME}"
+                    def project=""
+                    def gitUrl="${GIT_SOURCE_URL}"
+                    def gitUrlComponents="${GIT_SOURCE_COMPONENTS_URL}"
+                    def gitBranch="${GIT_SOURCE_REF}"
+                    def gitBranchComponents="${GIT_SOURCE_COMPONENTS_REF}"
+                    def contextDir=""
+                    def artifactName="${ARTIFACT_NAME}"
+
+                    node {
+                        stage("Initialize") {
+                            project = env.PROJECT_NAME
+                        }
+                    }
+
+                    node("maven") {
+                         // uncomment if you need to overwrite the default maven repository
+                         
+                         /* stage("update mirror") {
+                            sh "cat ~/.m2/settings.xml"
+                            sh "sed -i 's|<!-- ### configured mirrors ### -->|<mirror><mirrorOf>*</mirrorOf><url>https://repository.entando.org/repository/maven-public/</url><id>mirror</id></mirror>|' ~/.m2/settings.xml"
+                            sh "cat ~/.m2/settings.xml"
+                        }
+                        stage("info") {
+                        sh "cat ~/.m2/settings.xml"
+                        }*/
+
+                        // uncomment if you need to enable proxy settings
+
+                        /*
+                        stage("update proxy settings") {
+                        sh "cat ~/.m2/settings.xml"
+                        sh "sed -i 's|<!-- ### configured http proxy ### -->|<proxy><id>internal-proxy</id><active>true</active><protocol>http</protocol><host>proxy.example.com</host><port>8080</port><nonProxyHosts>*.maven.org</nonProxyHosts></proxy>|' ~/.m2/settings.xml"
+                        sh "cat ~/.m2/settings.xml"
+                        }
+                        stage("info") {
+                        sh "cat ~/.m2/settings.xml"
+                        }
+                        */
+                        
+                        stage("Ckecout Components") {
+                          checkout([$class: 'GitSCM', branches: [[name: "*/${gitBranchComponents}"]], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'bitbucket', url: "${gitUrlComponents}"]]])
+                        }
+                        stage("Install dependencies") {
+                          sh "mvn clean install -DskipTests && mvn clean"
+                        }
+                        stage("Checkout") {
+                             /*use for public repositories*/
+                            git url: "${gitUrl}", branch: "${gitBranch}"
+                            /*use for private repositories
+                            checkout([$class: 'GitSCM', branches: [[name: "*/${gitBranch}"]], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'bitbucket', url: "${gitUrl}"]]])
+                            */
+                        }
+                        stage("Build WAR") {
+                            sh "mvn clean package -Popenshift"
+                            //archiveArtifacts artifacts: 'target/${}'
+                            stash includes: "target/${artifactName}", name: 'war'
+                        }
+                    }
+
+                    node {
+                        stage("Build Image") {
+                            unstash name: 'war'
+                            sh "oc start-build ${appName}-docker --from-file=target/${artifactName} -n ${project}"
+                            timeout(time: 20, unit: 'MINUTES') {
+                                openshift.withCluster() {
+                                    openshift.withProject() {
+                                        def bc = openshift.selector('bc', "${appName}-docker")
+                                        echo "Found 1 ${bc.count()} buildconfig"
+                                        def blds = bc.related('builds')
+                                        blds.untilEach {
+                                            return it.object().status.phase == "Complete"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        stage("Deploy") {
+                            openshift.withCluster() {
+                                openshift.withProject() {
+                                    def dc = openshift.selector('dc', "${appName}")
+                                    dc.rollout().status()
+                                }
+                            }
+                        }
+                    }
+                }
+            } catch (err) {
+                echo "in catch block"
+                echo "Caught: ${err}"
+                currentBuild.result = 'FAILURE'
+                throw err
+            }
+        type: JenkinsPipeline
+      triggers:
+        - github:
+            secret: "${GITHUB_WEBHOOK_SECRET}"
+          type: GitHub
+        - gitlab:
+            secret: "${GITLAB_WEBHOOK_SECRET}"
+          type: GitLab
+        - bitbucket:
+            secret: "${BITBUCKET_WEBHOOK_SECRET}"
+          type: Bitbucket
+        - generic:
+            secret: "${GENERIC_WEBHOOK_SECRET}"
+          type: Generic
+  - apiVersion: v1
+    kind: BuildConfig
+    metadata:
+      labels:
+        app: ${APP_NAME}-docker
+      name: ${APP_NAME}-docker
+    spec:
+      output:
+        to:
+          kind: ImageStreamTag
+          name: ${APP_NAME}:latest
+      postCommit: {}
+      resources: {}
+      runPolicy: Serial
+      source:
+        dockerfile: |-
+          FROM entando/eap-imagick-okd:einet
+          COPY ${ARTIFACT_NAME} /opt/eap/standalone/deployments/${ARTIFACT_NAME}
+          CMD /opt/eap/bin/openshift-launch.sh
+        binary:
+          asFile: ${ARTIFACT_NAME}
+        type: Docker
+      strategy:
+        dockerStrategy:
+          from:
+            kind: ImageStreamTag
+            name: eap:einet
+        type: Docker
+      triggers: []
+  - apiVersion: v1
+    kind: DeploymentConfig
+    metadata:
+      labels:
+        app: ${APP_NAME}
+      name: ${APP_NAME}
+    spec:
+      replicas: 1
+      selector:
+        app: ${APP_NAME}
+        deploymentconfig: ${APP_NAME}
+      strategy:
+        rollingParams:
+          intervalSeconds: 10
+          maxSurge: 1
+          maxUnavailable: 1
+          timeoutSeconds: 600
+          updatePeriodSeconds: 1
+        type: Rolling
+      template:
+        metadata:
+          labels:
+            app: ${APP_NAME}
+            deploymentconfig: ${APP_NAME}
+        spec:
+          containers:
+            - env:
+                - name: DB_DRIVER
+                  value: "${DB_DRIVER}"
+                - name: DB_SQL_CHECK
+                  value: "${DB_SQL_CHECK}"
+                - name: DB_INITIAL_POOL_SIZE
+                  value: "${DB_INITIAL_POOL_SIZE}"
+                - name: DB_MAX_POOL_SIZE
+                  value: "${DB_MAX_POOL_SIZE}"
+                - name: DB_PORT_JNDI
+                  value: "${DB_PORT_JNDI}"
+                - name: DB_PORT_CONN
+                  value: "${DB_PORT_CONN}"
+                - name: DB_PORT_UID
+                  value: "${DB_PORT_UID}"
+                - name: DB_PORT_PSW
+                  value: "${DB_PORT_PSW}"
+                - name: DB_SERV_JNDI
+                  value: "${DB_SERV_JNDI}"
+                - name: DB_SERV_CONN
+                  value: "${DB_SERV_CONN}"
+                - name: DB_SERV_UID
+                  value: "${DB_SERV_UID}"
+                - name: DB_SERV_PSW
+                  value: "${DB_SERV_PSW}"
+                - name: DB_ANAGRAFICA_JNDI
+                  value: "${DB_ANAGRAFICA_JNDI}"
+                - name: DB_ANAGRAFICA_CONN
+                  value: "${DB_ANAGRAFICA_CONN}"
+                - name: DB_ANAGRAFICA_UID
+                  value: "${DB_ANAGRAFICA_UID}"
+                - name: DB_ANAGRAFICA_PSW
+                  value: "${DB_ANAGRAFICA_PSW}"
+                - name: KEYCLOAK_AUTH_URL
+                  value: "${KEYCLOAK_AUTH_URL}"
+                - name: KEYCLOAK_REALM
+                  value: "${KEYCLOAK_REALM}"
+                - name: KEYCLOAK_CLIENT_ID
+                  value: "${KEYCLOAK_CLIENT_ID}"
+                - name: KEYCLOAK_CLIENT_SECRET
+                  value: "${KEYCLOAK_CLIENT_SECRET}"
+                - name: KEYCLOAK_PUBLIC_CLIENT_ID
+                  value: "${KEYCLOAK_PUBLIC_CLIENT_ID}"
+                - name: OPENSHIFT_KUBE_PING_NAMESPACE
+                  value: "${OPENSHIFT_KUBE_PING_NAMESPACE}"
+                - name: OPENSHIFT_KUBE_PING_LABELS
+                  value: "${OPENSHIFT_KUBE_PING_LABELS}"
+                - name: OPENSHIFT_KUBE_PING_PORT_NAME
+                  value: "${OPENSHIFT_KUBE_PING_PORT_NAME}"
+                - name: JGROUPS_CLUSTER_PASSWORD
+                  value: "${JGROUPS_CLUSTER_PASSWORD}"
+                - name: XMS
+                  value: "${XMS}"
+                - name: XMX
+                  value: "${XMX}"
+              image: ${APP_NAME}:latest
+              imagePullPolicy: Always
+              name: ${APP_NAME}
+              volumeMounts:
+                - mountPath: "/entando-resources"
+                  name: volume-${APP_NAME}
+              ports:
+                - containerPort: 8080
+                  protocol: TCP
+                - containerPort: 8888
+                  name: ping
+                  protocol: TCP
+              resources: {}
+              terminationMessagePath: /dev/termination-log
+              livenessProbe:
+                httpGet:
+                  path: /
+                  port: 8080
+                  scheme: HTTP
+                initialDelaySeconds: 10
+                timeoutSeconds: 2
+                periodSeconds: 10
+                successThreshold: 1
+                failureThreshold: 3
+              readinessProbe:
+                httpGet:
+                  path: /
+                  port: 8080
+                  scheme: HTTP
+                initialDelaySeconds: 30
+                timeoutSeconds: 2
+                periodSeconds: 10
+                successThreshold: 1
+                failureThreshold: 3
+          volumes:
+            - name: volume-${APP_NAME}
+              persistentVolumeClaim:
+                claimName: claim-${APP_NAME}
+          dnsPolicy: ClusterFirst
+          restartPolicy: Always
+          securityContext: {}
+          terminationGracePeriodSeconds: 30
+      test: false
+      triggers:
+        - type: ConfigChange
+        - imageChangeParams:
+            automatic: true
+            containerNames:
+              - ${APP_NAME}
+            from:
+              kind: ImageStreamTag
+              name: ${APP_NAME}:latest
+          type: ImageChange
+    status: {}
+  - apiVersion: v1
+    kind: PersistentVolumeClaim
+    metadata:
+      name: pvc-${APP_NAME}
+    spec:
+      accessModes:
+        - ReadWriteMany
+      resources:
+        requests:
+          storage: ${STORAGE_SIZE}
+  - apiVersion: v1
+    kind: Service
+    metadata:
+      annotations:
+        openshift.io/generated-by: OpenShiftNewApp
+      labels:
+        app: ${APP_NAME}
+      name: ${APP_NAME}
+    spec:
+      ports:
+        - name: 8080-tcp
+          port: 8080
+          protocol: TCP
+          targetPort: 8080
+      selector:
+        app: ${APP_NAME}
+        deploymentconfig: ${APP_NAME}
+      sessionAffinity: None
+      type: ClusterIP
+    status:
+      loadBalancer: {}
+  - apiVersion: v1
+    kind: Route
+    metadata:
+      name: ${APP_NAME}
+      labels:
+        app: ${APP_NAME}
+    spec:
+      to:
+        kind: Service
+        name: ${APP_NAME}
+        weight: 100
+      port:
+        targetPort: 8080-tcp
+      tls:
+        insecureEdgeTerminationPolicy: Redirect
+        termination: edge
+      wildcardPolicy: None
