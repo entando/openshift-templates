@@ -302,7 +302,7 @@ objects:
                         }
                         */
                         
-                        stage("Ckecout Components") {
+                        stage("Checkout Components") {
                           checkout([$class: 'GitSCM', branches: [[name: "*/${gitBranchComponents}"]], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'bitbucket', url: "${gitUrlComponents}"]]])
                         }
                         stage("Install dependencies") {
