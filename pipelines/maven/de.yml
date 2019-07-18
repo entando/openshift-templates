@@ -57,24 +57,28 @@ parameters:
     generate: expression
     name: GITHUB_WEBHOOK_SECRET
     required: true
+
   - description: GitLab trigger secret.  A difficult to guess string encoded as part of the webhook URL.  Not encrypted.
     displayName: GitLab Webhook Secret
     from: '[a-zA-Z0-9]{40}'
     generate: expression
     name: GITLAB_WEBHOOK_SECRET
     required: true
+
   - description: Bitbucket trigger secret.  A difficult to guess string encoded as part of the webhook URL.  Not encrypted.
     displayName: Bitbucket Webhook Secret
     from: '[a-zA-Z0-9]{40}'
     generate: expression
     name: BITBUCKET_WEBHOOK_SECRET
     required: true
+
   - description: A secret string used to configure the Generic webhook.
     displayName: Generic Webhook Secret
     from: '[a-zA-Z0-9]{40}'
     generate: expression
     name: GENERIC_WEBHOOK_SECRET
     required: true
+
   - description: DB driver to use. Valid values are (oracle, postgresql, mysql)
     displayName: DB Driver
     name: DB_DRIVER
@@ -85,69 +89,83 @@ parameters:
     name: DB_INITIAL_POOL_SIZE
     required: true
     value: "5"
+
   - description: Used to set the max number of allowed connections to the db
     displayName: DB Max Pool Size
     name: DB_MAX_POOL_SIZE
     required: true
     value: "100"
+
   - description: Used to set the jndi name to be used for the entando port db
     displayName: JNDI Name Port Data Source
     name: DB_PORT_JNDI
     required: true
     value: java:jboss/datasources/[your-project]PortDataSource
+
   - description: Used to set the connection string for the entando's port db
     displayName: DB Port Connection String
     name: DB_PORT_CONN
     required: true
     value: jdbc:postgresql://localhost:5432/ENTANDOPORT
+
   - description: Used to set the username for the connection to entando's port d
     displayName: DB Port Username
     name: DB_PORT_UID
     required: true
     value: agile
+
   - description: Used to set the password for the connection to entando's port db
     displayName: DB Port Password
     name: DB_PORT_PSW
     required: true
     value: agile
+
   - description: Used to set the jndi name to be used for the entando serv db
     displayName: JNDI Name Serv Data Source
     name: DB_SERV_JNDI
     required: true
     value: java:jboss/datasources/[your-project]ServDataSource
+
   - description: Used to set the connection string for the entando's serv db
     displayName: DB Serv Connection String
     name: DB_SERV_CONN
     required: true
     value: jdbc:postgresql://localhost:5432/ENTANDOSERV
+
   - description: Used to set the username for the connection to entando's serv db
     displayName: DB Serv Username
     name: DB_SERV_UID
     required: true
     value: agile
+
   - description: Define the select to check DB connectivity. Default value is (SELECT 1) if you are using Oracle DB use (SELECT 1 FROM dual) instead.
     displayName: Sql Check
     name: DB_SQL_CHECK
     required: true
     value: SELECT 1
+
   - description: Used to set the password for the connection to entando's serv db
     displayName: DB Serv Password
     name: DB_SERV_PSW
     required: true
     value: agile
+
   - description: Used to set minimum heap size allocation. Expressed in MBytes. Default value 1024
     displayName: -Xms Value
     name: XMS
     value: "1024"
+
   - description: Used to set maximum heap size allocation. Expressed in MBytes. Default value 1024
     displayName: -Xmx Value
     name: XMX
     value: "2048"
+
   - description: Set the storage size needed for your application.
     displayName: Persistent Storage Size
     name: STORAGE_SIZE
     required: true
     value: "2Gi"
+
 objects:
   - apiVersion: v1
     kind: ImageStream
@@ -200,6 +218,14 @@ objects:
               value: ${GIT_SOURCE_REF}
             - name: ARTIFACT_NAME
               value: ${ARTIFACT_NAME}
+            - name: GIT_ENTANDO_CORE_SOURCE_URL
+              value: ${GIT_ENTANDO_CORE_SOURCE_URL}
+            - name: GIT_ENTANDO_CORE_REF
+              value: ${GIT_ENTANDO_CORE_REF}
+            - name: GIT_ENTANDO_COMPONENTS_SOURCE_URL
+              value: ${GIT_ENTANDO_COMPONENTS_SOURCE_URL}
+            - name: GIT_ENTANDO_COMPONENTS_REF
+              value: ${GIT_ENTANDO_COMPONENTS_REF}
           jenkinsfile: |-
             try {
                 timeout(time: 20, unit: 'MINUTES') {
