@@ -282,26 +282,26 @@ objects:
                         
                         stage("Checkout entando core") {
                           /*use for public repositories*/
-                          git url: "${gitUrlEntandoCore}", branch: "${gitBranchEntandoCore}"
+                            git url: "${gitUrlEntandoCore}", branch: "${gitBranchEntandoCore}"
                           /* use for private repositories
-                          checkout([$class: 'GitSCM', branches: [[name: "*/${gitBranchEntandoCore}"]], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'bitbucket', url: "${gitUrlEntandoCore}"]]])
+                            checkout([$class: 'GitSCM', branches: [[name: "*/${gitBranchEntandoCore}"]], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'bitbucket', url: "${gitUrlEntandoCore}"]]])
                           */
                         }
 
                         stage("Install Entando core dependencies") {
-                          sh "mvn clean install -DskipTests"
+                            sh "mvn clean install -DskipTests"
                         }
 
                         stage("Checkout entando components") {
                           /*use for public repositories*/
-                          git url: "${gitUrlEntandoComponents", branch: "${gitBranchEntandoComponents}"
+                            git url: "${gitUrlEntandoComponents}", branch: "${gitBranchEntandoComponents}"
                           /* use for private repositories
-                          checkout([$class: 'GitSCM', branches: [[name: "*/${gitBranchEntandoComponents}"]], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'bitbucket', url: "${gitUrlEntandoComponents}"]]])
+                            checkout([$class: 'GitSCM', branches: [[name: "*/${gitBranchEntandoComponents}"]], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'bitbucket', url: "${gitUrlEntandoComponents}"]]])
                           */
                         }
 
                         stage("install Entando components dependencies") {
-                          sh "mvn clean install -DskipTests"
+                            sh "mvn clean install -DskipTests"
                         }
 
                         stage("Checkout") {
