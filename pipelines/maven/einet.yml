@@ -94,7 +94,7 @@ parameters:
     displayName: JNDI Name Port Data Source
     name: DB_PORT_JNDI
     required: true
-    value: java:jboss/datasources/eineteiPortDataSource
+    value: java:jboss/datasources/einetPortDataSource
   - description: Used to set the connection string for the entando's port db
     displayName: DB Port Connection String
     name: DB_PORT_CONN
@@ -114,7 +114,7 @@ parameters:
     displayName: JNDI Name Serv Data Source
     name: DB_SERV_JNDI
     required: true
-    value: java:jboss/datasources/eineteiServDataSource
+    value: java:jboss/datasources/einetServDataSource
   - description: Used to set the connection string for the entando's serv db
     displayName: DB Serv Connection String
     name: DB_SERV_CONN
@@ -134,7 +134,7 @@ parameters:
     displayName: JNDI Name Anagrafica Data Source
     name: DB_ANAGRAFICA_JNDI
     required: true
-    value: java:jboss/datasources/eineteiAnagraficaDataSource
+    value: java:jboss/datasources/einetAnagraficaDataSource
   - description: Used to set the connection string for the anagrafica db
     displayName: DB Anagrafica Connection String
     name: DB_ANAGRAFICA_CONN
