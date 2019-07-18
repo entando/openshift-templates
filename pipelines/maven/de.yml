@@ -216,6 +216,10 @@ objects:
                     def project=""
                     def gitUrl="${GIT_SOURCE_URL}"
                     def gitBranch="${GIT_SOURCE_REF}"
+                    def gitUrlEntandoCore="${GIT_ENTANDO_CORE_SOURCE_URL}"
+                    def gitBranchEntandoCore="${GIT_ENTANDO_CORE_REF}"
+                    def gitUrlEntandoComponents="${GIT_ENTANDO_COMPONENTS_SOURCE_URL}"
+                    def gitBranchEntandoComponents="${GIT_ENTANDO_COMPONENTS_REF}"
                     def contextDir=""
                     def artifactName="${ARTIFACT_NAME}"
 
@@ -250,6 +254,30 @@ objects:
                         }
                         */
                         
+                        stage("Checkout entando core") {
+                          /*use for public repositories*/
+                          git url: "${gitUrlEntandoCore}", branch: "${gitBranchEntandoCore}"
+                          /* use for private repositories
+                          checkout([$class: 'GitSCM', branches: [[name: "*/${gitBranchEntandoCore}"]], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'bitbucket', url: "${gitUrlEntandoCore}"]]])
+                          */
+                        }
+
+                        stage("Install Entando core dependencies") {
+                          sh "mvn clean install -DskipTests"
+                        }
+
+                        stage("Checkout entando components") {
+                          /*use for public repositories*/
+                          git url: "${gitUrlEntandoCore}", branch: "${gitBranchEntandoCore}"
+                          /* use for private repositories
+                          checkout([$class: 'GitSCM', branches: [[name: "*/${gitBranchEntandoComponents}"]], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'bitbucket', url: "${gitUrlEntandoComponents}"]]])
+                          */
+                        }
+
+                        stage("install Entando components dependencies") {
+                          sh "mvn clean install -DskipTests"
+                        }
+
                         stage("Checkout") {
                              /*use for public repositories*/
                             git url: "${gitUrl}", branch: "${gitBranch}"
