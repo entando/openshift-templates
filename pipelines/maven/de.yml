@@ -8,21 +8,49 @@ parameters:
     displayName: Application Name
     required: true
     value:
+
   - name: ARTIFACT_NAME
     description: Name of the artifact to be deployed on JBoss
     displayName: Artifact name
     required: true
-    value: your-app.war
+    value: digital-exchange.war
+
   - name: GIT_SOURCE_URL
     description: The source URL for the application
     displayName: Source URL
     required: true
-    value: 
+    value: https://github.com/entando/digital-exchange.git
+
   - name: GIT_SOURCE_REF
     description: The source Ref for the application(branch name)
     displayName: Source Ref
     required: true
     value: master
+  
+  - name: GIT_ENTANDO_CORE_SOURCE_URL
+    description: Entando core source URI
+    displayName: Entando core source URI
+    required: true
+    value: https://github.com/entando/entando-core.git
+  
+  - name: GIT_ENTANDO_CORE_REF
+    description: Entando core branch name to be used
+    displayName: Entando core branch name
+    required: true
+    value: master
+
+  - name: GIT_ENTANDO_COMPONENTS_SOURCE_URL
+    description: Entando components source URI
+    displayName: Entando components source URI
+    required: true
+    value: https://github.com/entando/entando-components.git
+
+  - name: GIT_ENTANDO_COMPONENTS_REF
+    description: Entando components branch name to be used
+    displayName: Entando components branch
+    required: true
+    value: master
+
   - description: Github trigger secret.  A difficult to guess string encoded as part of the webhook URL.  Not encrypted.
     displayName: GitHub Webhook Secret
     from: '[a-zA-Z0-9]{40}'
