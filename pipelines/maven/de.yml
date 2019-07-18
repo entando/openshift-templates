@@ -294,7 +294,7 @@ objects:
 
                         stage("Checkout entando components") {
                           /*use for public repositories*/
-                          git url: "${gitUrlEntandoCore}", branch: "${gitBranchEntandoCore}"
+                          git url: "${gitUrlEntandoComponents", branch: "${gitBranchEntandoComponents}"
                           /* use for private repositories
                           checkout([$class: 'GitSCM', branches: [[name: "*/${gitBranchEntandoComponents}"]], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'bitbucket', url: "${gitUrlEntandoComponents}"]]])
                           */
