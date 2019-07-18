@@ -281,11 +281,10 @@ objects:
                         */
                         
                         stage("Checkout entando core") {
-                          /*use for public repositories*/
+                          // use for public repositories
                             git url: "${gitUrlEntandoCore}", branch: "${gitBranchEntandoCore}"
-                          /* use for private repositories
-                            checkout([$class: 'GitSCM', branches: [[name: "*/${gitBranchEntandoCore}"]], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'bitbucket', url: "${gitUrlEntandoCore}"]]])
-                          */
+                          // use for private repositories
+                          // checkout([$class: 'GitSCM', branches: [[name: "*/${gitBranchEntandoCore}"]], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'bitbucket', url: "${gitUrlEntandoCore}"]]])
                         }
 
                         stage("Install Entando core dependencies") {
@@ -293,11 +292,10 @@ objects:
                         }
 
                         stage("Checkout entando components") {
-                          /*use for public repositories*/
+                          // use for public repositories
                             git url: "${gitUrlEntandoComponents}", branch: "${gitBranchEntandoComponents}"
-                          /* use for private repositories
-                            checkout([$class: 'GitSCM', branches: [[name: "*/${gitBranchEntandoComponents}"]], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'bitbucket', url: "${gitUrlEntandoComponents}"]]])
-                          */
+                          // use for private repositories
+                          //  checkout([$class: 'GitSCM', branches: [[name: "*/${gitBranchEntandoComponents}"]], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'bitbucket', url: "${gitUrlEntandoComponents}"]]])
                         }
 
                         stage("install Entando components dependencies") {
@@ -305,11 +303,10 @@ objects:
                         }
 
                         stage("Checkout") {
-                             /*use for public repositories*/
+                             // use for public repositories
                             git url: "${gitUrl}", branch: "${gitBranch}"
-                            /*use for private repositories
-                            checkout([$class: 'GitSCM', branches: [[name: "*/${gitBranch}"]], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'bitbucket', url: "${gitUrl}"]]])
-                            */
+                            // use for private repositories
+                            // checkout([$class: 'GitSCM', branches: [[name: "*/${gitBranch}"]], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'bitbucket', url: "${gitUrl}"]]])
                         }
                         stage("Build WAR") {
                             sh "mvn clean package -Popenshift"
