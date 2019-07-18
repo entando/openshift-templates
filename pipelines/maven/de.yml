@@ -432,7 +432,7 @@ objects:
           volumes:
             - name: volume-${APP_NAME}
               persistentVolumeClaim:
-                claimName: claim-${APP_NAME}
+                claimName: pvc-${APP_NAME}
           dnsPolicy: ClusterFirst
           restartPolicy: Always
           securityContext: {}
