@@ -133,8 +133,6 @@ objects:
   - apiVersion: v1
     kind: ImageStream
     metadata:
-      labels:
-        app: ${APP_NAME}
       name: eap
     spec:
       tags:
