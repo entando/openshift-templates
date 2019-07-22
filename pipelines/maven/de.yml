@@ -22,7 +22,7 @@ parameters:
     description: The source Ref for the application(branch name)
     displayName: Source Ref
     required: true
-    value: master
+    value: v5.0.2
   - description: Github trigger secret.  A difficult to guess string encoded as part of the webhook URL.  Not encrypted.
     displayName: GitHub Webhook Secret
     from: '[a-zA-Z0-9]{40}'
@@ -51,7 +51,7 @@ parameters:
     displayName: DB Driver
     name: DB_DRIVER
     required: true
-    value: postgresql
+    value: oracle
   - description: Used to set initial pool size for db connections
     displayName: DB Initial Pool Size
     name: DB_INITIAL_POOL_SIZE
@@ -66,12 +66,12 @@ parameters:
     displayName: JNDI Name Port Data Source
     name: DB_PORT_JNDI
     required: true
-    value: java:jboss/datasources/[your-project]PortDataSource
+    value: java:jboss/datasources/digital-exchangePortDataSource
   - description: Used to set the connection string for the entando's port db
     displayName: DB Port Connection String
     name: DB_PORT_CONN
     required: true
-    value: jdbc:postgresql://localhost:5432/ENTANDOPORT
+    value: jdbc:oracle:thin:@localhost:1521/ENTANDOPORT
   - description: Used to set the username for the connection to entando's port d
     displayName: DB Port Username
     name: DB_PORT_UID
@@ -86,12 +86,12 @@ parameters:
     displayName: JNDI Name Serv Data Source
     name: DB_SERV_JNDI
     required: true
-    value: java:jboss/datasources/[your-project]ServDataSource
+    value: java:jboss/datasources/digital-exchangeServDataSource
   - description: Used to set the connection string for the entando's serv db
     displayName: DB Serv Connection String
     name: DB_SERV_CONN
     required: true
-    value: jdbc:postgresql://localhost:5432/ENTANDOSERV
+    value: jdbc:oracle:thin:@localhost:1521/ENTANDOSERV
   - description: Used to set the username for the connection to entando's serv db
     displayName: DB Serv Username
     name: DB_SERV_UID
@@ -101,7 +101,7 @@ parameters:
     displayName: Sql Check
     name: DB_SQL_CHECK
     required: true
-    value: SELECT 1
+    value: SELECT 1 FROM dual
   - description: Used to set the password for the connection to entando's serv db
     displayName: DB Serv Password
     name: DB_SERV_PSW
