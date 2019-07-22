@@ -22,7 +22,7 @@ parameters:
     description: The source Ref for the application(branch name)
     displayName: Source Ref
     required: true
-    value: v5.0.2
+    value: v5.2.0
   - description: Github trigger secret.  A difficult to guess string encoded as part of the webhook URL.  Not encrypted.
     displayName: GitHub Webhook Secret
     from: '[a-zA-Z0-9]{40}'
