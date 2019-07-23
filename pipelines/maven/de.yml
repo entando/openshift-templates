@@ -133,7 +133,7 @@ objects:
   - apiVersion: v1
     kind: ImageStream
     metadata:
-      name: ${APP_NAME}
+      name: ${APP_NAME}-is
     spec:
       tags:
         - annotations:
@@ -309,7 +309,7 @@ objects:
         dockerStrategy:
           from:
             kind: ImageStreamTag
-            name: ${APP_NAME}:1.0
+            name: ${APP_NAME}-is:1.0
         type: Docker
       triggers: []
   - apiVersion: v1
