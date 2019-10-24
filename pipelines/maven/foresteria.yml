@@ -195,6 +195,26 @@ parameters:
     name: DB_ANAGRAFICA_PSW
     required: true
     value: password
+  - description: Used to set the jndi name to be used for the audit db
+    displayName: JNDI Name Audit Data Source
+    name: DB_AUDIT_JNDI
+    required: true
+    value: java:jboss/datasources/foresteria_auditDataSource
+  - description: Used to set the connection string for the audit db
+    displayName: DB Audit Connection String
+    name: DB_AUDIT_CONN
+    required: true
+    value: jdbc:oracle:thin:@[your-oracle-server]:1521/SERVICE
+  - description: Used to set the username for the connection to audit db
+    displayName: DB Audit Username
+    name: DB_AUDIT_UID
+    required: true
+    value: foresteria_audit
+  - description: Used to set the password for the connection to audit db
+    displayName: DB Audit Password
+    name: DB_AUDIT_PSW
+    required: true
+    value: foresteria_audit
   - description: Define the select to check DB connectivity. Default value is (SELECT 1) if you are using Oracle DB use (SELECT 1 FROM dual) instead.
     displayName: Sql Check Entando DBs
     name: DB_SQL_CHECK
