@@ -515,6 +515,14 @@ objects:
                   value: "${DB_ANAGRAFICA_UID}"
                 - name: DB_ANAGRAFICA_PSW
                   value: "${DB_ANAGRAFICA_PSW}"
+                - name: DB_AUDIT_JNDI
+                  value: "${DB_AUDIT_JNDI}"
+                - name: DB_AUDIT_CONN
+                  value: "${DB_AUDIT_CONN}"
+                - name: DB_AUDIT_UID
+                  value: "${DB_AUDIT_UID}"
+                - name: DB_AUDIT_PSW
+                  value: "${DB_AUDIT_PSW}"
                 - name: KEYCLOAK_AUTH_URL
                   value: "${KEYCLOAK_AUTH_URL}"
                 - name: KEYCLOAK_REALM
