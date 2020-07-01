@@ -1,0 +1,161 @@
+apiVersion: template.openshift.io/v1
+kind: Template
+labels:
+  template: ecr-template-installation
+message: |-
+  A jenkins server will be automatically instantiated in this project to manage
+  the Pipeline BuildConfig created by this template. You will be able to log in to
+  it using your Openshift user credentials.
+metadata:
+  annotations:
+    desctiption: |-
+      This showcases the Jenkins Pipeline integration in Openshift,
+      which performs continuous integration and deployment right on the platform.
+    iconClass: icon-jenkins
+    openshift.io/display-name: Ecr Pipeline
+    tags: instant-app, jenkins
+  name: ecr-template-installation
+objects:
+-  apiVersion: "v1"
+   kind: "BuildConfig"
+
+   metadata:
+     annotations:
+       pipeline.alpha.openshift.io/uses: '[{"name": "${NAME}", "namespace": "", "kind": "DeploymentConfig"}]'
+     labels:
+       name: ecr-pipeline
+     name: "ecr-pipeline"
+   spec:
+     strategy:
+       jenkinsPipelineStrategy:
+         env:
+           - name: ECR_NAME
+             value: ${ECR_NAME}
+           - name: ECR_VCS_DOMAIN
+             value: ${ECR_VCS_DOMAIN}
+           - name: ECR_GIT_URL
+             value: ${ECR_GIT_URL}
+           - name: ECR_NAME_SPACE
+             value: ${ECR_NAME_SPACE}
+           - name: DE_URI
+             value: ${DE_URI}
+         jenkinsfile: |-
+           // path of the template to use
+           // name of the template that will be created
+           def templateName = 'ecr-install-template'
+           // NOTE, the "pipeline" directive/closure from the declarative pipeline syntax needs to include, or be nested outside,
+           // and "openshift" directive/closure from the OpenShift Client Plugin for Jenkins.  Otherwise, the declarative pipeline engine
+           // will not be fully engaged.
+           def ecrName="${ECR_NAME}"
+           def credentialID='gitlab'
+           def vcsProviderDomain="${ECR_VCS_DOMAIN}"
+           def gitBundleUrl="${ECR_GIT_URL}"
+           def ecrNameSpace="${ECR_NAME_SPACE}"
+           def deInstance="${DE_URI}"
+           pipeline {
+               agent {
+                 node {
+                   // spin up a node.js slave pod to run this build on
+                   label 'nodejs'
+                 }
+               }
+               options {
+                   // set a timeout of 20 minutes for this pipeline
+                   timeout(time: 20, unit: 'MINUTES')
+               }
+               stages {
+                   stage('preamble') {
+                       steps {
+                           script {
+                               openshift.withCluster() {
+                                   openshift.withProject() {
+                                       echo "Using project: ${openshift.project()}"
+                                   }
+                               }
+                           }
+                       }
+                   }
+                   stage('Generate ECR') {
+                       steps {
+                           script {
+                               openshift.withCluster() {
+                                   openshift.withProject() {
+                                       // Uncomment this block for private repositories
+                                       withCredentials([usernamePassword(credentialsId: "${credentialID}", passwordVariable: "GIT_PASSWORD", usernameVariable: "GIT_USERNAME")]) {
+                                           sh '''
+                                               printf "machine ${vcsProviderDomain}\n login $GIT_USERNAME\n password $GIT_PASSWORD" >> ~/.netrc
+                                               # Execute entando-bundle
+                                               entando-bundle from-git --repository='''+gitBundleUrl+''' --dry-run | oc create -f -
+                                           '''
+                                       }
+                                       // Uncomment this block for public repositories
+                                       //sh "entando-bundle from-git --repository=${gitBundleUrl} --dry-run | oc create -f - "
+                                   }
+                               }
+                           } // script
+                       } // steps
+                   } // stage
+                   stage('Install ECR') {
+                       steps {
+                           script {
+                               openshift.withCluster() {
+                                   openshift.withProject() {
+                                       // Get access token from keycloak
+                                       sh '''
+                                           # Retreive keycloak URI
+                                           kcUri=$(oc get ingress | grep kc | awk '{print $2}')
+
+                                           # Retreive the secret tha contains the kc client-id and client-secret
+                                           mySecret=$(oc get secrets | grep server-secret | awk '{print $1}')
+
+                                           #Retreive the client-id from the secret
+                                           clientId=$(oc get secret $mySecret -o yaml | grep clientId | awk '{print $2}' | base64 -d | tr -d '[=%=]')
+
+                                           # Retreive the client-secret from the secret
+                                           clientSecret=$(oc get secret $mySecret -o yaml | grep clientSecret | awk '{print $2}' | base64 -d | tr -d '[=%=]')
+                                        
+                                           # Execute a CURL call to retreive the access token
+                                           myAccessToken=$(curl -L -X POST "$kcUri/auth/realms/entando/protocol/openid-connect/token" -H "Content-Type: application/x-www-form-urlencoded" --data-urlencode "client_id=$clientId" --data-urlencode "grant_type=password" --data-urlencode "client_secret=$clientSecret" --data-urlencode "scope=openid" --data-urlencode "username=admin" --data-urlencode "password=adminadmin" | python -c "import sys, json; print(json.load(sys.stdin)['access_token'])")
+
+                                           # Execute the final CURL call to install the ECR
+                                           curl -L -X POST "'''+deInstance+'''/components/'''+ecrName+'''/install" --header 'Content-Type: application/x-www-form-urlencoded' --header "Authorization: Bearer $myAccessToken"
+                                       '''
+                                   }
+                               }
+                           } // script
+                       } // steps
+                   } // stage
+               } // stages
+           } // pipeline
+         type: JenkinsPipeline
+parameters:
+- description: The name assigned to all of the frontend objects defined in this template.
+  displayName: Name
+  name: NAME
+  required: true
+  value: ecr-pipeline
+- description: The name of the ECR to be installed
+  displayName: ECR name
+  name: ECR_NAME
+  required: true
+  value: example-bundle
+- description: The name of the namespace(Openshift project name) where the ecr will be installed
+  displayName: ECR namespace
+  name: ECR_NAME_SPACE
+  required: true
+  value: my-app
+- description: The VCS provider domain name (github.com, bitbucket.org, gitlab.com or your custom domain)
+  displayName: VCS domain name
+  name: ECR_VCS_DOMAIN
+  required: true
+  value: github.com
+- description: The name of the ECR repository to be installed
+  displayName: ECR repository url
+  name: ECR_GIT_URL
+  required: true
+  value: https://github.com/pietrangelo/entando-bundle.git
+- description: The value of the digital-exchange URI (Leave the final '/' out)
+  displayname: DE URI
+  name: DE_URI
+  required: true
+  value: http://quickstart-my-app.127.0.0.1.nip.io/digital-exchange
