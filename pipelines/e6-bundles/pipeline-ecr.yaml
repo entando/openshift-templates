@@ -23,18 +23,24 @@ objects:
      annotations:
        pipeline.alpha.openshift.io/uses: '[{"name": "${NAME}", "namespace": "", "kind": "DeploymentConfig"}]'
      labels:
-       name: ecr-pipeline
-     name: "ecr-pipeline"
+       name: ${ECR_NAME}
+     name: "${ECR_NAME}"
    spec:
      strategy:
        jenkinsPipelineStrategy:
          env:
+           - name: APP_NAME
+             value: ${APP_NAME}
            - name: ECR_NAME
              value: ${ECR_NAME}
+           - name: ECR_FILE_NAME
+             value: ${ECR_FILE_NAME}
            - name: ECR_VCS_DOMAIN
              value: ${ECR_VCS_DOMAIN}
            - name: ECR_GIT_URL
              value: ${ECR_GIT_URL}
+           - name: ECR_GIT_URL_BRANCH
+             value: ${ECR_GIT_URL_BRANCH}
            - name: ECR_NAME_SPACE
              value: ${ECR_NAME_SPACE}
            - name: DE_URI
@@ -47,9 +53,12 @@ objects:
            // and "openshift" directive/closure from the OpenShift Client Plugin for Jenkins.  Otherwise, the declarative pipeline engine
            // will not be fully engaged.
            def ecrName="${ECR_NAME}"
+           def appName="${NAME}"
            def credentialID='gitlab'
+           def ecrFileName="${ECR_FILE_NAME}"
            def vcsProviderDomain="${ECR_VCS_DOMAIN}"
            def gitBundleUrl="${ECR_GIT_URL}"
+           def gitBundleBranch="${ECR_GIT_URL_BRANCH}"
            def ecrNameSpace="${ECR_NAME_SPACE}"
            def deInstance="${DE_URI}"
            pipeline {
@@ -75,26 +84,28 @@ objects:
                            }
                        }
                    }
-                   stage('Generate ECR') {
+                   stage('Clone ECR') {
                        steps {
                            script {
                                openshift.withCluster() {
                                    openshift.withProject() {
-                                       // Uncomment this block for private repositories
-                                       withCredentials([usernamePassword(credentialsId: "${credentialID}", passwordVariable: "GIT_PASSWORD", usernameVariable: "GIT_USERNAME")]) {
-                                           sh '''
-                                               printf "machine ${vcsProviderDomain}\n login $GIT_USERNAME\n password $GIT_PASSWORD" >> ~/.netrc
-                                               # Execute entando-bundle
-                                               entando-bundle from-git --repository='''+gitBundleUrl+''' --dry-run | oc create -f -
-                                           '''
-                                       }
-                                       // Uncomment this block for public repositories
-                                       //sh "entando-bundle from-git --repository=${gitBundleUrl} --dry-run | oc create -f - "
+                                     checkout([$class: 'GitSCM', branches: [[name: "*/${gitBundleBranch}"]], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'gitlab', url: "${gitBundleUrl}"]]])
                                    }
                                }
                            } // script
                        } // steps
                    } // stage
+                   stage('Push ECR') {
+                     steps {
+                       script {
+                         openshift.withCluster() {
+                           openshift.withProject() {
+                             sh "oc apply -f ${ecrFileName} -n ${ecrNameSpace}"
+                       } //end withProject
+                     } //end withCluster
+                   } //end script
+               } //end steps
+           } //end stage
                    stage('Install ECR') {
                        steps {
                            script {
@@ -106,7 +117,7 @@ objects:
                                            kcUri=$(oc get ingress | grep kc | awk '{print $2}')
 
                                            # Retreive the secret tha contains the kc client-id and client-secret
-                                           mySecret=$(oc get secrets | grep server-secret | awk '{print $1}')
+                                           mySecret=$(oc get secrets | grep '''+appName+'''-server-secret | awk '{print $1}')
 
                                            #Retreive the client-id from the secret
                                            clientId=$(oc get secret $mySecret -o yaml | grep clientId | awk '{print $2}' | base64 -d | tr -d '[=%=]')
@@ -133,12 +144,22 @@ parameters:
   displayName: Name
   name: NAME
   required: true
-  value: ecr-pipeline
+  value: 
+- description: The name of the entando app referenced with this bundle
+  displayName: APP_NAME
+  name: APP_NAME
+  required: true
+  value:
 - description: The name of the ECR to be installed
   displayName: ECR name
   name: ECR_NAME
   required: true
   value: example-bundle
+- description: The path of the yaml file to be installed
+  displayName: ECR_FILE_NAME
+  name: ECR_FILE_NAME
+  required: true
+  value: bundle/your_yaml_file.yaml
 - description: The name of the namespace(Openshift project name) where the ecr will be installed
   displayName: ECR namespace
   name: ECR_NAME_SPACE
@@ -154,6 +175,11 @@ parameters:
   name: ECR_GIT_URL
   required: true
   value: https://github.com/pietrangelo/entando-bundle.git
+- description: The name of the branch to install the ECR from
+  displayName: ECR_GIT_URL_BRANCH
+  name: ECR_GIT_URL_BRANCH
+  required: true
+  value:
 - description: The value of the digital-exchange URI (Leave the final '/' out)
   displayname: DE URI
   name: DE_URI
