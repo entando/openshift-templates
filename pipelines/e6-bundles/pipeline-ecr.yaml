@@ -113,6 +113,9 @@ objects:
                                    openshift.withProject() {
                                        // Get access token from keycloak
                                        sh '''
+                                           # Retreive bundle version to install (always latest version)
+                                           bundleVersion=$(oc get entandodebundles.entando.org/'''+ecrName+''' -o yaml | grep latest: | awk '{print $2}')
+                                           
                                            # Retreive keycloak URI
                                            kcUri=$(oc get ingress | grep kc | awk '{print $2}')
 
@@ -129,7 +132,7 @@ objects:
                                            myAccessToken=$(curl -L -X POST "$kcUri/auth/realms/entando/protocol/openid-connect/token" -H "Content-Type: application/x-www-form-urlencoded" --data-urlencode "client_id=$clientId" --data-urlencode "grant_type=password" --data-urlencode "client_secret=$clientSecret" --data-urlencode "scope=openid" --data-urlencode "username=admin" --data-urlencode "password=adminadmin" | python -c "import sys, json; print(json.load(sys.stdin)['access_token'])")
 
                                            # Execute the final CURL call to install the ECR
-                                           curl -L -X POST "'''+deInstance+'''/components/'''+ecrName+'''/install" --header 'Content-Type: application/x-www-form-urlencoded' --header "Authorization: Bearer $myAccessToken"
+                                           curl -L -X POST "'''+deInstance+'''/components/'''+ecrName+'''/install" --header 'Content-Type: application/json' --header "Authorization: Bearer $myAccessToken" --data "{\\"version\\":\\"$bundleVersion\\"}"
                                        '''
                                    }
                                }
